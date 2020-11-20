@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
     tools:context=".activities.MainActivity">
 
     <ProgressBar
@@ -12,44 +15,124 @@
         android:visibility="gone"
         android:translationZ="5dp"
         android:id="@+id/progressBar"
+        android:layout_gravity="center"
+        />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/icon_add"
+        android:elevation="12dp"
+        android:backgroundTint="@color/red70"
+        android:tint="@color/gray0"
+        android:layout_margin="12dp"
+        android:id="@+id/addFabButton"/>
+    <LinearLayout
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-    <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
-        android:id="@+id/add_word_editText_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:primaryColor="@color/colorPrimaryDark"
-        app:secondaryColor="@android:color/holo_blue_light"
-        app:endIcon="@drawable/ic_baseline_add_circle_24"
-        app:labelText="please enter your word"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:baselineAligned="false"
+        android:layout_height="match_parent">
 
-        <studio.carbonylgroup.textfieldboxes.ExtendedEditText
-            android:id="@+id/add_word_EditText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:id="@+id/toolbar"
+            android:layoutDirection="ltr"
+            android:gravity="top"
+            android:layout_height="75dp"
+            android:background="@drawable/shape_gradiant_background">
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="My Dictionary"
+                android:textColor="@color/gray0"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_height="wrap_content"/>
 
-    </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
+        </androidx.appcompat.widget.Toolbar>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:elevation="12dp"
+        android:id="@+id/FragmentContainer"
+        android:background="@drawable/shape_top_round_corners"
+        android:layout_marginTop="-15dp"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/add_word_editText_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/recyclerview_background"
+        android:orientation="vertical"
         android:layout_margin="12dp"
+        android:baselineAligned="false"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="12dp"
+        android:elevation="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/shape_left_rounded_corners"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/word_TextView"
+                android:layout_margin="4dp"
+                android:textSize="16sp"
+                android:textColor="@color/gray0"
+                android:text="word"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/shape_right_rounded_corners"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/definition_TextView"
+                android:layout_margin="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/Black60"
+                android:text="definition"
+                />
+        </LinearLayout>
+    </LinearLayout>
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="8dp"
+        android:elevation="6dp"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:baselineAligned="false"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
         android:layout_height="wrap_content">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/Black100"
+            />
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/recyclerView"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" />
+
+    </androidx.cardview.widget.CardView>
+    </LinearLayout>
+    </FrameLayout>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

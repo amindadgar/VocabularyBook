@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:orientation="horizontal"
     android:weightSum="3"
     android:layout_height="wrap_content"
@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_weight="2"
-        android:background="@color/gray70"
+        android:background="@color/Black90"
         android:layout_height="match_parent">
     <TextView
         android:layout_width="match_parent"
@@ -16,23 +16,25 @@
         android:id="@+id/word_TextView"
         android:layout_margin="4dp"
         android:textSize="16sp"
-        android:textColor="@color/Black80"
+        android:textColor="@color/gray0"
         android:text="word"
         />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:background="@color/gray50"
+        android:background="@color/Blue50"
         android:layout_weight="1"
-        android:layout_height="match_parent">
+        android:orientation="horizontal"
+        android:id="@+id/recycler_definition_expandable"
+        android:layout_height="wrap_content">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/definition_TextView"
         android:layout_margin="4dp"
         android:textSize="14sp"
-        android:textColor="@color/Black80"
+        android:textColor="@color/Black60"
         android:text="definition"
         />
     </LinearLayout>

@@ -6,8 +6,11 @@ import com.amindadgar.mydictionary.model.RoomDatabaseModel.*
 
 @Dao
 interface WordsDao {
-    @Query("SELECT word, definitions FROM Words JOIN Definition ON (Words.id = Definition.word_id)")
+    @Query("SELECT id,word, definitions FROM Words JOIN Definition ON (Words.id = Definition.word_id)")
     fun loadWordsDefinition():LiveData<List<WordDefinitionTuple>>
+
+    @Query("SELECT * FROM AllData WHERE id = :id")
+    fun loadAllData(id:Int):LiveData<List<AllData>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllData(words: Words, definition: Definition, phonetics: Phonetics, Synonym: Synonym)

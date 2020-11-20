@@ -6,16 +6,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.widget.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amindadgar.mydictionary.R
-import com.amindadgar.mydictionary.Utils.WordsApi.DictionaryRetrofitBuilder
 import com.amindadgar.mydictionary.Utils.WordsRecycler.WordRecyclerAdapter
-import com.amindadgar.mydictionary.model.DictionaryApi.DictionaryData
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.*
+import com.andreseko.SweetAlert.SweetAlertDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,11 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.lang.Exception
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -35,62 +30,44 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wordsViewModel:WordsViewModel
     private var id:Int = 0
     private lateinit var sharePreferenceEditor: SharedPreferences.Editor
+    lateinit var fab:FloatingActionButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val sharedPreferences = getSharedPreferences("sharedPrefs",Context.MODE_PRIVATE)
+
+        fab = findViewById(R.id.addFabButton)
+
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         sharePreferenceEditor = sharedPreferences.edit()
         id = sharedPreferences.getInt("IdNum",0)
 
         wordsViewModel = ViewModelProviders.of(this).get(WordsViewModel::class.java)
 
-        val recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf())
+        val recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(),supportFragmentManager)
+
         recyclerView.adapter = recyclerViewAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.reverseLayout = false
+        linearLayoutManager.stackFromEnd = true
+        recyclerView.layoutManager = linearLayoutManager
 
         val db = Firebase.firestore
 
-        add_word_editText_container.endIconImageButton.setOnClickListener {
-            progressBar.visibility = View.VISIBLE
-
-            try {
-                Log.d("Dictionary ID",id.toString())
-                //get text from editText
-                val word = "${add_word_EditText.text}"
-                // request data and if there was no connection error save it to database
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    val requestCode = wordsViewModel.getWord(word,id)
-                    if (requestCode == 200){
-                        //increase id and save it when the activity is paused
-                        id++
-                        sharePreferenceEditor.putInt("IdNum",id).apply()
-                        withContext(Dispatchers.Main){
-                            progressBar.visibility = View.GONE
-                        }
-                    }else {
-                        withContext(Dispatchers.Main){
-                            Toast.makeText(this@MainActivity,"Error fetching data\nCode: $requestCode",Toast.LENGTH_LONG).show()
-                            progressBar.visibility = View.GONE
-                        }
-                    }
-                }
-
-            }catch (ex:Exception){
-                ex.printStackTrace()
-                progressBar.visibility = View.GONE
-                Toast.makeText(this,"Error ${ex.message}",Toast.LENGTH_LONG).show()
-
-            }
-        }
 
         wordsViewModel.allWords.observe(this, Observer { words ->
             words?.let {
                 recyclerViewAdapter.setWords(words as ArrayList<WordDefinitionTuple>)
+                linearLayoutManager.scrollToPosition(words.size-1)
+
             }
 
         })
+
+        initFab()
 
 
 
@@ -113,12 +90,134 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
 
+
+    private fun initFab(){
+
+
+
+
+
+        fab.setOnClickListener {
+            val dialogView = setupDialogLayout()
+
+            val dialog = SweetAlertDialog(this,SweetAlertDialog.NORMAL_TYPE)
+                .setConfirmText("Ok")
+                .setTitleText("Add Word")
+            dialog.setCustomView(dialogView)
+
+
+            fab.animate().apply {
+                rotation(360f)
+                scaleX(0f)
+                scaleY(0f)
+                duration = 1000
+            }
+            dialog.show()
+
+
+            dialog.setConfirmClickListener {
+                Log.d("REQUEST","DATA")
+                val textView = (dialogView as LinearLayout).getChildAt(0)
+                var word = (textView as TextView).text.toString()
+
+                // if the last of word contains space delete it
+                if (word[word.length -1] == ' ') {
+                    word = word.substring(0..word.length-2)
+                }
+                request(word)
+
+                dialog.dismiss()
+                fab.animate().apply {
+                    rotation(0f)
+                    scaleX(1f)
+                    scaleY(1f)
+                    duration = 1000
+                }
+            }
+            dialog.setOnDismissListener {
+                fab.animate().apply {
+                    rotation(0f)
+                    scaleX(1f)
+                    scaleY(1f)
+                    duration = 1000
+                }
+            }
+        }
     }
 
+    private fun request(word:String){
+        progressBar.visibility = View.VISIBLE
+        try {
+            //get text from editText
+            // request data and if there was no connection error save it to database
+            CoroutineScope(Dispatchers.IO).launch {
+                var requestCode = -1
 
+                // if nothing was entered set request code -12
+                requestCode = if (!word.isBlank())
+                    wordsViewModel.getWord(word,id)
+                else
+                    -12
 
+                when (requestCode) {
+                    200 -> {
+                        //increase id and save it when the activity is paused
+                        id++
+                        sharePreferenceEditor.putInt("IdNum",id).apply()
+                        withContext(Dispatchers.Main){
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                    -12 -> {
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(this@MainActivity,"Empty word!",Toast.LENGTH_LONG).show()
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                    else -> {
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(this@MainActivity,"Error fetching data\nCode: $requestCode",Toast.LENGTH_LONG).show()
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            progressBar.visibility = View.GONE
+            Toast.makeText(this,"Error ${ex.message}",Toast.LENGTH_LONG).show()
+
+        }
+    }
+
+    private fun setupDialogLayout():View{
+        // setup editText
+        val editText = EditText(this)
+        editText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT
+            ,LinearLayout.LayoutParams.MATCH_PARENT,
+            1f)
+        //setup imageView
+        val imageView = ImageView(this)
+        imageView.setImageResource(R.drawable.icon_mic)
+        imageView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT,6f)
+        imageView.scaleX = 0.8f
+        imageView.scaleY = 0.8f
+
+        //setup layout container
+        val linearLayout = LinearLayout(this)
+        linearLayout.orientation = LinearLayout.HORIZONTAL
+        linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT)
+        linearLayout.weightSum = 7f
+
+        // add view's to linear layout
+        linearLayout.addView(editText)
+        linearLayout.addView(imageView)
+
+        return linearLayout
+    }
 
 }

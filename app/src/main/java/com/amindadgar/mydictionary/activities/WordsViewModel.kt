@@ -11,11 +11,8 @@ import com.amindadgar.mydictionary.Utils.Database.WordRoomDatabase
 import com.amindadgar.mydictionary.Utils.WordsApi.DictionaryRetrofitBuilder
 import com.amindadgar.mydictionary.model.DictionaryApi.DictionaryData
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
+import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 
 class WordsViewModel(application: Application):AndroidViewModel(application) {
@@ -33,17 +30,22 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
         repository.insertData(words, definition, phonetics,Synonym)
     }
 
-    fun insertDefinition(definition: Definition) = viewModelScope.launch {
+    private fun insertDefinition(definition: Definition) = viewModelScope.launch {
         repository.insertDefinition(definition)
     }
-    fun insertSynonym(synonym: Synonym) = viewModelScope.launch {
+    private fun insertSynonym(synonym: Synonym) = viewModelScope.launch {
         repository.insertSynonym(synonym)
     }
-    fun insertPhonetics(phonetics: Phonetics) = viewModelScope.launch {
+    private fun insertPhonetics(phonetics: Phonetics) = viewModelScope.launch {
         repository.insertPhonetics(phonetics)
     }
-    fun insertWords(words: Words) = viewModelScope.launch {
+    private fun insertWords(words: Words) = viewModelScope.launch {
         repository.insertWords(words)
+    }
+    fun getAllData(id: Int):LiveData<List<AllData>>{
+        return runBlocking(viewModelScope.coroutineContext) {
+             repository.getAllData(id)
+        }
     }
 
     fun deleteAll(){
@@ -56,15 +58,24 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
         }
     }
     fun getWord(word:String,id:Int):Int{
-        var returnValue = false
-        val request:Response<ArrayList<DictionaryData>> = DictionaryRetrofitBuilder.apiService.GetDefenitions(word).execute()
-        if (request.body()!= null){
-            Log.d("Dictionary", request.body().toString())
-            Log.d("Dictionary is SuccessFull", request.isSuccessful.toString())
+        var returnValue = -100
+        try {
+            val request:Response<ArrayList<DictionaryData>> = DictionaryRetrofitBuilder.apiService.GetDefenitions(word).execute()
+            if (request.body()!= null){
+                Log.d("Dictionary", request.body().toString())
+                Log.d("Dictionary is SuccessFull", request.isSuccessful.toString())
 
-            insertDatas(request.body()!!,id)
+                insertDatas(request.body()!!,id)
+                returnValue = request.code()
+            }else{
+                returnValue = request.code()
+                Log.e("Body","is Empty")
+            }
+
+        }catch (ex:Exception){
+            ex.printStackTrace()
         }
-        return request.code()
+        return returnValue
 
     }
     private fun insertDatas(data :ArrayList<DictionaryData>,id:Int){
@@ -112,5 +123,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
             ))
         }
     }
+
+
 
 }

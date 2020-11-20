@@ -29,4 +29,7 @@ class WordsRepository(private val wordDao:WordsDao) {
     suspend fun deleteData() {
         wordDao.deleteAll()
     }
+    suspend fun getAllData(id:Int):LiveData<List<AllData>>{
+        return wordDao.loadAllData(id)
+    }
 }

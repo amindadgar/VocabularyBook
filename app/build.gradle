@@ -35,6 +35,9 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     def room_version = "2.2.5"
     def lifecycleVersion = "2.2.0"
 
@@ -66,8 +69,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0'
 
 
-    //TextView library
-    implementation 'com.github.HITGIF:TextFieldBoxes:1.4.5'
 
 
     //Room Components
@@ -90,6 +91,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+
+    implementation 'com.github.andreseko:sweet-alert-dialog:1.0.6'
+    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
 
 
 }
