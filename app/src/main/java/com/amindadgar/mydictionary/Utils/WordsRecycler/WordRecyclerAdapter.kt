@@ -1,10 +1,10 @@
 package com.amindadgar.mydictionary.Utils.WordsRecycler
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -12,13 +12,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.fragments.WordsInDetailFragment
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.WordDefinitionTuple
+import com.andreseko.SweetAlert.SweetAlertDialog
 
-class WordRecyclerAdapter(private val context:Context,
-                          private var data:ArrayList<WordDefinitionTuple>,
-                            private val fragmentManager: FragmentManager)
+class WordRecyclerAdapter(
+    private val context: Context,
+    private var data: ArrayList<WordDefinitionTuple>,
+    private val fragmentManager: FragmentManager
+)
     :RecyclerView.Adapter<WordRecyclerAdapter.WordRecyclerViewHolder>() {
 
     private val wordsData:ArrayList<WordDefinitionTuple> = arrayListOf()
+    private val TAG = "RecyclerView adapter"
 
     init {
 //        data.forEachIndexed { index, wordDefinitionTuple ->
@@ -28,10 +32,10 @@ class WordRecyclerAdapter(private val context:Context,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordRecyclerViewHolder {
         val inflater = LayoutInflater.from(context)
-        inflater.inflate(R.layout.dictionary_recycler_row_item,parent,false)
+        inflater.inflate(R.layout.dictionary_recycler_row_item, parent, false)
 
         return WordRecyclerViewHolder(
-            inflater.inflate(R.layout.dictionary_recycler_row_item,parent,false)
+            inflater.inflate(R.layout.dictionary_recycler_row_item, parent, false)
         )
     }
 
@@ -57,7 +61,10 @@ class WordRecyclerAdapter(private val context:Context,
 
 
             fragmentManager.beginTransaction()
-                .replace(R.id.FragmentContainer,WordsInDetailFragment.newInstance(data[position].id))
+                .replace(
+                    R.id.FragmentContainer,
+                    WordsInDetailFragment.newInstance(data[position].id)
+                )
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit()
@@ -67,28 +74,22 @@ class WordRecyclerAdapter(private val context:Context,
     inner class WordRecyclerViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
         val wordTextView: TextView = itemView.findViewById(R.id.word_TextView)
         val definitionTextView: TextView = itemView.findViewById(R.id.definition_TextView)
-        val definitionLayout:LinearLayout = itemView.findViewById(R.id.recycler_definition_expandable)
-//        init {
-//            wordTextView.setOnClickListener {
-//                if (definitionLayout.alpha == 0f){
-//                    definitionLayout.animate().apply {
-//                        alpha(1f)
-//                        duration = 500
-//                    }.start()
-//                }else {
-//                    definitionLayout.animate().apply {
-//                        alpha(0f)
-//                        duration = 500
-//                    }.start()
-//                }
-//            }
-//        }
+
     }
-    internal fun setWords(data: ArrayList<WordDefinitionTuple>,enableDefinition:Boolean = true){
+    internal fun setWords(data: ArrayList<WordDefinitionTuple>, enableDefinition: Boolean = true){
         if (enableDefinition)
             this.data = data
         else
             this.data = wordsData
         notifyDataSetChanged()
+    }
+    fun deleteWord(position: Int):WordDefinitionTuple{
+        // save data in tmp variable to return it
+        // by returning data we will tell that we removed the selected item
+        Log.d(TAG, "deleteWord: Deleting from recyclerView")
+        val tmp = data[position]
+        data.removeAt(position)
+        notifyDataSetChanged()
+        return tmp
     }
 }

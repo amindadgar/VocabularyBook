@@ -19,6 +19,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
     private val repository:WordsRepository
     val allWords:LiveData<List<WordDefinitionTuple>>
     val context:Context = application.applicationContext
+    private val TAG = "WordsViewModel"
 
     init {
         val wordDao = WordRoomDatabase.getInstance(application,viewModelScope).WordsDao()
@@ -57,6 +58,16 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
             repository.deleteData()
         }
     }
+
+    fun deleteWord(word: Words) {
+        viewModelScope.launch {
+            Log.d(TAG, "deleteWord: Deleting from Repo")
+            repository.deleteWord(word)
+        }
+    }
+
+
+
     fun getWord(word:String,id:Int):Int{
         var returnValue = -100
         try {
@@ -113,6 +124,8 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
                         Log.d("Dictionary synonym",synonyms)
                         this.insertSynonym(Synonym(id,synonyms))
                     }
+                }else {
+                    this.insertSynonym(Synonym(id,"No Synonyms available"))
                 }
             }
         }

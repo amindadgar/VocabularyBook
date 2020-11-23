@@ -32,4 +32,5 @@ interface WordsDao {
 
     @Query("DELETE FROM words")
     suspend fun deleteAll()
+
 }

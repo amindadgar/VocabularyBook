@@ -56,7 +56,7 @@
         android:layout_width="match_parent"
         android:elevation="12dp"
         android:id="@+id/FragmentContainer"
-        android:background="@drawable/shape_top_round_corners"
+        android:background="@color/Black60"
         android:layout_marginTop="-15dp"
         android:layout_height="match_parent">
 
