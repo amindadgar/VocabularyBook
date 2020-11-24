@@ -1,12 +1,20 @@
 package com.amindadgar.mydictionary.activities
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +32,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +43,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharePreferenceEditor: SharedPreferences.Editor
     lateinit var fab:FloatingActionButton
     private val TAG = "MainActivity"
+    val REQUEST_AUDIO_CODE = 100
+    private var listeningToVoice = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +119,107 @@ class MainActivity : AppCompatActivity() {
             dialog.setCustomView(dialogView)
 
 
+            val textView = (dialogView as LinearLayout).getChildAt(0)
+            val voiceIcon = (dialogView as LinearLayout).getChildAt(1) as ImageView
+
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+                checkVoicePermission()
+            }
+            val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS , 100);
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+
+            voiceIcon.setOnClickListener {
+                /**
+                default scale is 0.8
+                when user clicks it we would make icon bigger
+                else if the user wanted to cancel listening while the speech is not ended the icon's scale is 1f so we would cancel it!
+
+                 */
+                if (voiceIcon.scaleX == 0.8f) {
+                    voiceIcon.animate().apply {
+                        scaleX(1f)
+                        scaleY(1f)
+                        duration = 100
+                    }
+                    speechRecognizer.startListening(intent)
+                }
+                else {
+                    speechRecognizer.stopListening()
+                }
+
+
+            }
+
+            speechRecognizer.setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(p0: Bundle?) {}
+
+                override fun onBeginningOfSpeech() {
+                    Toast.makeText(this@MainActivity, "Listening ...", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onRmsChanged(p0: Float) {}
+
+                override fun onBufferReceived(p0: ByteArray?) {
+                    Log.d(TAG + "Voice", "onBufferReceived: ${p0.toString()}")
+                }
+
+                override fun onEndOfSpeech() {
+                    Log.d(TAG, "onEndOfSpeech: Ended!")
+                    speechRecognizer.stopListening()
+                    voiceIcon.animate().apply {
+                        scaleX(0.8f)
+                        scaleY(0.8f)
+                    }
+                }
+
+                override fun onError(p0: Int) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error fetching data from server code:$p0",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onResults(p0: Bundle?) {
+                    if (p0 != null) {
+                        val data: ArrayList<String>? =
+                            p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        Toast.makeText(this@MainActivity, data!!.toString(), Toast.LENGTH_LONG)
+                            .show()
+
+                        (textView as TextView).text = data[0]
+
+                    }
+
+                }
+
+                override fun onPartialResults(p0: Bundle?) {
+                    Log.d(TAG + "voice", "onPartialResults: ")
+                    if (p0 != null) {
+                        val data: ArrayList<String>? =
+                            p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        Toast.makeText(this@MainActivity, data!!.toString(), Toast.LENGTH_LONG)
+                            .show()
+                        Log.d(TAG + "voice", "onPartialResults: $data")
+
+                    }
+
+                }
+
+                override fun onEvent(p0: Int, p1: Bundle?) {
+                    Log.d(TAG, "onEvent: $p0")
+                }
+
+            })
+
+
             fab.animate().apply {
                 rotation(360f)
                 scaleX(0f)
@@ -117,14 +231,17 @@ class MainActivity : AppCompatActivity() {
 
             dialog.setConfirmClickListener {
                 Log.d("REQUEST", "DATA")
-                val textView = (dialogView as LinearLayout).getChildAt(0)
                 var word = (textView as TextView).text.toString()
 
-                // if the last of word contains space delete it
-                if (word[word.length - 1] == ' ') {
-                    word = word.substring(0..word.length - 2)
+                if (!word.isBlank()) {
+                    // if the last of word contains space delete it
+                    if (word[word.length - 1] == ' ') {
+                        word = word.substring(0..word.length - 2)
+                    }
+                    request(word)
+                }else{
+                    Toast.makeText(this,"Please enter your word",Toast.LENGTH_SHORT).show()
                 }
-                request(word)
 
                 dialog.dismiss()
                 fab.animate().apply {
@@ -212,6 +329,7 @@ class MainActivity : AppCompatActivity() {
         )
         imageView.scaleX = 0.8f
         imageView.scaleY = 0.8f
+        imageView.tag = "VoiceButton"
 
         //setup layout container
         val linearLayout = LinearLayout(this)
@@ -252,9 +370,13 @@ class MainActivity : AppCompatActivity() {
                             dialog.dismissWithAnimation()
                         }
                         dialog.setConfirmClickListener {
-                        val deletedWord: WordDefinitionTuple? = adapter.deleteWord(position)
+                            val deletedWord: WordDefinitionTuple? = adapter.deleteWord(position)
 
-                            Toast.makeText(this@MainActivity,"Deleting ${deletedWord!!.words}",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Deleting ${deletedWord!!.words}",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
                             dialog.dismissWithAnimation()
                             // if we deleted the word we will delete it from database too
@@ -269,5 +391,37 @@ class MainActivity : AppCompatActivity() {
                 })
         )
     }
+    private fun setUpWordChooserView(wordsCount:Int):View {
+
+        //setup layout container
+        val linearLayout = LinearLayout(this)
+        linearLayout.orientation = LinearLayout.HORIZONTAL
+        linearLayout.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        linearLayout.weightSum = wordsCount.toFloat()
+
+        for (i in 0 until wordsCount) {
+            val textView = TextView(this)
+            textView.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,
+                1f
+            )
+            linearLayout.addView(textView)
+        }
+
+        return linearLayout
+
+    }
+
+    private fun checkVoicePermission(){
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.RECORD_AUDIO),
+            REQUEST_AUDIO_CODE
+        )
+    }
+
 
 }
