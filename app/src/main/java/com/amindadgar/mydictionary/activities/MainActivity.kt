@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var fab:FloatingActionButton
     private val TAG = "MainActivity"
     val REQUEST_AUDIO_CODE = 100
-    private var listeningToVoice = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

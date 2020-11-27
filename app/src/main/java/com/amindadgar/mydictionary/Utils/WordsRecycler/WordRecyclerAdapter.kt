@@ -63,7 +63,7 @@ class WordRecyclerAdapter(
             fragmentManager.beginTransaction()
                 .replace(
                     R.id.FragmentContainer,
-                    WordsInDetailFragment.newInstance(data[position].id)
+                    WordsInDetailFragment.newInstance(data[position].id,data[position].words)
                 )
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)

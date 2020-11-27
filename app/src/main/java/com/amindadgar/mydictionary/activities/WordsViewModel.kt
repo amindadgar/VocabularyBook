@@ -91,6 +91,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
     }
     private fun insertDatas(data :ArrayList<DictionaryData>,id:Int){
         this.insertWords(Words(id,data[0].word))
+        var synonymAvailable = false
 
         for (meanings in data[0].meanings){
             for (definition in meanings.defenitions){
@@ -123,11 +124,12 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
                     for (synonyms in definition.synonyms) {
                         Log.d("Dictionary synonym",synonyms)
                         this.insertSynonym(Synonym(id,synonyms))
+                        synonymAvailable = true
                     }
-                }else {
-                    this.insertSynonym(Synonym(id,"No Synonyms available"))
                 }
             }
+            if (!synonymAvailable)
+                this.insertSynonym(Synonym(id,"No Synonyms available"))
         }
         for (phonetics in data[0].phonetics){
             Log.d("Dictionary phonetics",phonetics.phonetic)
