@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="horizontal"
-    android:weightSum="3"
+    android:orientation="vertical"
+    android:background="@drawable/recyclerview_background"
+    android:weightSum="4"
+    android:layout_margin="8dp"
+    android:elevation="8dp"
+    android:padding="12dp"
     android:layout_height="wrap_content"
     android:baselineAligned="false">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_weight="2"
-        android:background="@color/Black90"
         android:layout_height="match_parent">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/word_TextView"
+        android:textStyle="bold"
         android:layout_margin="4dp"
-        android:textSize="16sp"
-        android:textColor="@color/gray0"
+        android:textSize="18sp"
+        android:textColor="@color/Black90"
         android:text="word"
         />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:background="@color/Blue50"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="horizontal"
         android:id="@+id/recycler_definition_expandable"
         android:layout_height="wrap_content">
@@ -34,7 +37,7 @@
         android:id="@+id/definition_TextView"
         android:layout_margin="4dp"
         android:textSize="14sp"
-        android:textColor="@color/Black60"
+        android:textColor="@color/Black80"
         android:text="definition"
         />
     </LinearLayout>

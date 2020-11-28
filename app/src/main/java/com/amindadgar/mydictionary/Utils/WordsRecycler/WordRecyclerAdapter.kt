@@ -25,9 +25,7 @@ class WordRecyclerAdapter(
     private val TAG = "RecyclerView adapter"
 
     init {
-//        data.forEachIndexed { index, wordDefinitionTuple ->
-//            wordsData.add(index,WordDefinitionTuple(wordDefinitionTuple.words,"_NO DATA_"))
-//        }
+        initializeItems()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordRecyclerViewHolder {
@@ -40,30 +38,19 @@ class WordRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return wordsData.size
     }
 
     override fun onBindViewHolder(holder: WordRecyclerViewHolder, position: Int) {
-        if (position > 0) {
-            // do not repeat words if the last was the same
-            if (data[position].words == data[position - 1].words) {
-                holder.wordTextView.text = ""
-                holder.definitionTextView.text = data[position].definitions
-            }else {
-                holder.wordTextView.text = data[position].words
-                holder.definitionTextView.text = data[position].definitions
-            }
-        }else {
-            holder.wordTextView.text = data[position].words
-            holder.definitionTextView.text = data[position].definitions
-        }
+        holder.wordTextView.text = wordsData[position].words
+        holder.definitionTextView.text = wordsData[position].definitions
         holder.itemView.setOnClickListener { _ ->
 
 
             fragmentManager.beginTransaction()
                 .replace(
                     R.id.FragmentContainer,
-                    WordsInDetailFragment.newInstance(data[position].id,data[position].words)
+                    WordsInDetailFragment.newInstance(wordsData[position].id,wordsData[position].words)
                 )
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
@@ -76,12 +63,28 @@ class WordRecyclerAdapter(
         val definitionTextView: TextView = itemView.findViewById(R.id.definition_TextView)
 
     }
-    internal fun setWords(data: ArrayList<WordDefinitionTuple>, enableDefinition: Boolean = true){
-        if (enableDefinition)
-            this.data = data
-        else
-            this.data = wordsData
+    internal fun setWords(data: ArrayList<WordDefinitionTuple>){
+        this.data = data
+        initializeItems()
         notifyDataSetChanged()
+    }
+    private fun initializeItems(){
+        var i = 0
+        var lastWord = ""
+        data.forEach{ wordDefinitionTuple ->
+            if (lastWord != wordDefinitionTuple.words){
+                lastWord = wordDefinitionTuple.words
+                wordsData.add(i++,wordDefinitionTuple)
+            }else{
+                val tempIndex = i - 1
+                wordsData[tempIndex] = WordDefinitionTuple(wordsData[tempIndex].id
+                    ,wordsData[tempIndex].words
+                    ,wordsData[tempIndex].definitions + "\n\n" + wordDefinitionTuple.definitions)
+                Log.d(TAG, "initializeItems id: ${wordsData[tempIndex].id}")
+                Log.d(TAG, "initializeItems definition: ${wordsData[tempIndex].definitions}")
+            }
+            Log.d(TAG, "WORD: ${wordDefinitionTuple.words}")
+        }
     }
     fun deleteWord(position: Int):WordDefinitionTuple{
         // save data in tmp variable to return it
