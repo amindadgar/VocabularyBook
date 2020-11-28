@@ -11,11 +11,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:baselineAligned="false"
+        android:gravity="start"
+        android:layout_margin="12dp"
         android:orientation="horizontal">
         <LinearLayout
             android:layout_width="wrap_content"
-            android:background="@drawable/word_background_shape"
+            android:baselineAligned="false"
             android:layout_height="wrap_content">
 
         <LinearLayout
@@ -35,23 +37,24 @@
                 android:gravity="center"
                 android:text="word name"
                 android:textColor="@color/gray0"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/phonetics_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="start"
                 android:textStyle="bold"
                 android:textColor="@color/gray0"
-                android:textSize="12sp" />
+                android:textSize="16sp" />
 
 
         </LinearLayout>
         <ImageView
             android:id="@+id/sound_play"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="top|center_horizontal"
             android:layout_width="24dp"
+            android:layout_marginTop="10dp"
             android:layout_height="24dp"
             android:src="@drawable/icon_sound" />
         </LinearLayout>
@@ -67,15 +70,15 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:gravity="center"
-                android:text="Definition"
-                android:textColor="@color/gray0"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="12dp"-->
+<!--                android:gravity="center"-->
+<!--                android:text="Definition"-->
+<!--                android:textColor="@color/gray0"-->
+<!--                android:textSize="22sp"-->
+<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/definition_text"
@@ -86,15 +89,15 @@
                 android:textColor="@color/gray0"
                 android:textSize="22sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:gravity="center"
-                android:text="sample sentence"
-                android:textColor="@color/gray0"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="12dp"-->
+<!--                android:gravity="center"-->
+<!--                android:text="sample sentence"-->
+<!--                android:textColor="@color/gray0"-->
+<!--                android:textSize="22sp"-->
+<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/sample_sentence_text"
@@ -104,15 +107,15 @@
                 android:textColor="@color/gray0"
                 android:textSize="22sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:gravity="center"
-                android:text="synonym"
-                android:textColor="@color/gray0"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="12dp"-->
+<!--                android:gravity="center"-->
+<!--                android:text="synonym"-->
+<!--                android:textColor="@color/gray0"-->
+<!--                android:textSize="22sp"-->
+<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/synonym_text"
