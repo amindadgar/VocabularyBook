@@ -52,7 +52,6 @@ class WordRecyclerAdapter(
                     R.id.FragmentContainer,
                     WordsInDetailFragment.newInstance(wordsData[position].id,wordsData[position].words)
                 )
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit()
         }

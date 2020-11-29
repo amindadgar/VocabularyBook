@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="12dp"
+    android:id="@+id/wordsInDetailFragmentLayout"
+    android:paddingTop="2dp"
     android:layout_height="match_parent"
-    android:background="@color/Black60"
+    android:background="@drawable/shape_bottom_round_corners"
     android:orientation="vertical">
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
+
         android:gravity="start"
         android:layout_margin="12dp"
         android:orientation="horizontal">
@@ -36,7 +44,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="word name"
-                android:textColor="@color/gray0"
+                android:textColor="@color/Black90"
                 android:textSize="22sp"
                 android:textStyle="bold" />
             <TextView
@@ -45,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:textStyle="bold"
-                android:textColor="@color/gray0"
+                android:textColor="@color/Black60"
                 android:textSize="16sp" />
 
 
@@ -56,29 +64,21 @@
             android:layout_width="24dp"
             android:layout_marginTop="10dp"
             android:layout_height="24dp"
-            android:src="@drawable/icon_sound" />
+            android:src="@drawable/icon_sound"
+            app:tint="@color/Black60" />
         </LinearLayout>
     </LinearLayout>
 
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<!--    <androidx.core.widget.NestedScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_margin="12dp"-->
-<!--                android:gravity="center"-->
-<!--                android:text="Definition"-->
-<!--                android:textColor="@color/gray0"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/definition_text"
@@ -86,36 +86,18 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:gravity="start|top"
-                android:textColor="@color/gray0"
+                android:textColor="@color/Black80"
                 android:textSize="22sp" />
 
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_margin="12dp"-->
-<!--                android:gravity="center"-->
-<!--                android:text="sample sentence"-->
-<!--                android:textColor="@color/gray0"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/sample_sentence_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:textColor="@color/gray0"
+                android:textColor="@color/Black80"
                 android:textSize="22sp" />
 
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_margin="12dp"-->
-<!--                android:gravity="center"-->
-<!--                android:text="synonym"-->
-<!--                android:textColor="@color/gray0"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold" />-->
 
             <TextView
                 android:id="@+id/synonym_text"
@@ -123,9 +105,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:gravity="start|top"
-                android:textColor="@color/gray0"
+                android:textColor="@color/Black80"
                 android:textSize="22sp" />
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</LinearLayout>
+<!--    </androidx.core.widget.NestedScrollView>-->
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

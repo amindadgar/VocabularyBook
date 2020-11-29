@@ -1,20 +1,21 @@
 package com.amindadgar.mydictionary.fragments
 
+import android.annotation.SuppressLint
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
+import android.view.*
+import android.view.animation.Animation
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.amindadgar.mydictionary.R
+import com.labo.kaji.fragmentanimations.MoveAnimation
 import java.io.IOException
 import java.lang.IllegalArgumentException
 
@@ -30,7 +31,7 @@ class WordsInDetailFragment : Fragment() {
             }
         }
     }
-
+    private var TAG = "WordsInDetailFragment"
     private lateinit var viewModel: WordsInDetailViewModel
 
     private lateinit var definitionText:TextView
@@ -40,6 +41,7 @@ class WordsInDetailFragment : Fragment() {
     private lateinit var wordTextView: TextView
     private lateinit var soundIcon:ImageView
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var fragmentLayout:androidx.core.widget.NestedScrollView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,11 +58,24 @@ class WordsInDetailFragment : Fragment() {
         synonymText = view.findViewById(R.id.synonym_text)
         wordTextView = view.findViewById(R.id.word_TextView)
         soundIcon = view.findViewById(R.id.sound_play)
+        fragmentLayout = view.findViewById(R.id.wordsInDetailFragmentLayout)
     }
 
+//    @SuppressLint("ClickableViewAccessibility")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(WordsInDetailViewModel::class.java)
+
+//        fragmentLayout.setOnTouchListener { view, motionEvent ->
+//            when(motionEvent.action){
+//                MotionEvent.ACTION_MOVE -> {
+//                    val actionType = motionEvent.action
+//                    Log.d(TAG, "onActivityCreated: ACTION_OUTSIDE")
+//                    true
+//                }
+//                else -> true
+//            }
+//        }
 
         val id = requireArguments().getInt("ID")
         val word = requireArguments().getString("WordString")
@@ -122,6 +137,13 @@ class WordsInDetailFragment : Fragment() {
             ex.printStackTrace()
         }
 
+    }
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        return if (enter)
+            MoveAnimation.create(MoveAnimation.UP,enter,500)
+        else
+            MoveAnimation.create(MoveAnimation.DOWN,enter,500)
     }
 
     override fun onStart() {

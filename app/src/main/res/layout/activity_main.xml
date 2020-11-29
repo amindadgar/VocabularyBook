@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
+    android:orientation="vertical"
     tools:context=".activities.MainActivity">
 
     <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:translationZ="5dp"
-        android:id="@+id/progressBar"
         android:layout_gravity="center"
-        />
+        android:translationZ="5dp"
+        android:visibility="gone" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addFabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:src="@drawable/icon_add"
-        android:elevation="12dp"
-        android:backgroundTint="@color/red70"
-        android:tint="@color/gray0"
         android:layout_margin="12dp"
-        android:id="@+id/addFabButton"/>
+        android:backgroundTint="@color/Black50"
+        android:elevation="12dp"
+        android:src="@drawable/icon_add"
+        android:tint="@color/gray0" />
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="match_parent"
-        android:baselineAligned="false"
-        android:layout_height="match_parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
             android:id="@+id/toolbar"
-            android:layoutDirection="ltr"
-            android:gravity="top"
-            android:layout_height="75dp"
-            android:background="@drawable/shape_gradiant_background">
-            <TextView
-                android:layout_width="wrap_content"
-                android:text="My Dictionary"
-                android:textColor="@color/gray0"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_height="wrap_content"/>
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layoutDirection="ltr">
+
 
         </androidx.appcompat.widget.Toolbar>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:elevation="12dp"
-        android:id="@+id/FragmentContainer"
-        android:background="@drawable/shape_top_round_corners"
-        android:layout_marginTop="-15dp"
-        android:layout_height="match_parent">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray50"
+            />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="12dp"
-        android:baselineAligned="false"
-        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/FragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/recyclerView"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp" />
+            >
 
-    </LinearLayout>
-    </FrameLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="12dp"
+                android:paddingEnd="12dp"
+                android:paddingStart="12dp"
+                android:baselineAligned="false"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout_editor_absoluteX="1dp"
+                    tools:layout_editor_absoluteY="1dp" />
+
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
 

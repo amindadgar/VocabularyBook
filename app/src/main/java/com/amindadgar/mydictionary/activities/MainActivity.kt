@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.addFabButton)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
+//        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         sharePreferenceEditor = sharedPreferences.edit()
         id = sharedPreferences.getInt("IdNum", 0)
