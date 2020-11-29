@@ -71,6 +71,7 @@ class WordRecyclerAdapter(
     private fun initializeItems(){
         var i = 0
         var lastWord = ""
+        wordsData.clear()
         data.forEach{ wordDefinitionTuple ->
             if (lastWord != wordDefinitionTuple.words){
                 lastWord = wordDefinitionTuple.words
