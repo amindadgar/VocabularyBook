@@ -13,8 +13,11 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.VelocityTrackerCompat.getXVelocity
+import androidx.core.view.VelocityTrackerCompat.getYVelocity
 import androidx.lifecycle.Observer
 import com.amindadgar.mydictionary.R
+import com.amindadgar.mydictionary.Utils.UiUtils.MyScrollView
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import java.io.IOException
 import java.lang.IllegalArgumentException
@@ -41,7 +44,7 @@ class WordsInDetailFragment : Fragment() {
     private lateinit var wordTextView: TextView
     private lateinit var soundIcon:ImageView
     private lateinit var mediaPlayer: MediaPlayer
-    private lateinit var fragmentLayout:androidx.core.widget.NestedScrollView
+    private lateinit var fragmentLayout:MyScrollView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +62,7 @@ class WordsInDetailFragment : Fragment() {
         wordTextView = view.findViewById(R.id.word_TextView)
         soundIcon = view.findViewById(R.id.sound_play)
         fragmentLayout = view.findViewById(R.id.wordsInDetailFragmentLayout)
+        fragmentLayout.initializeFragmentManager(requireActivity().supportFragmentManager)
     }
 
 //    @SuppressLint("ClickableViewAccessibility")
@@ -76,6 +80,7 @@ class WordsInDetailFragment : Fragment() {
 //                else -> true
 //            }
 //        }
+
 
         val id = requireArguments().getInt("ID")
         val word = requireArguments().getString("WordString")
@@ -99,7 +104,7 @@ class WordsInDetailFragment : Fragment() {
                 if (lastSampleSentence != it.example_sentence)
                     sampleSentenceText.text = "${sampleSentenceText.text} \n${it.example_sentence}\n"
                 if (lastPhonetics != it.phoneticText) {
-                    phoneticsText.text = "${phoneticsText.text}\n${it.phoneticText}\n"
+                    phoneticsText.text = "${phoneticsText.text}\n${it.phoneticText}"
                     soundUri = it.phoneticAudio
                 }
                 if (lastSynonym != it.synonym)
@@ -113,6 +118,7 @@ class WordsInDetailFragment : Fragment() {
         })
 
         soundIcon.setOnClickListener {
+            changeVolumeButton(true)
             initializeAudio(Uri.parse(soundUri))
         }
     }
@@ -131,11 +137,32 @@ class WordsInDetailFragment : Fragment() {
                 prepare()
                 start()
             }
+            mediaPlayer.setOnCompletionListener {
+                changeVolumeButton(false)
+            }
         }catch (ex:IOException){
             ex.printStackTrace()
         }catch (ex:IllegalArgumentException){
             ex.printStackTrace()
         }
+
+    }
+    // this functions are to change the behaviour of volume button when to start voice or end it!
+    private fun changeVolumeButton(enable:Boolean){
+        if (enable)
+            soundIcon.animate().apply {
+                alpha(2f)
+                scaleY(1.3f)
+                scaleX(1.3f)
+                duration = 100
+            }.start()
+        else
+            soundIcon.animate().apply {
+                alpha(1f)
+                scaleY(1f)
+                scaleX(1f)
+                duration = 400
+            }.start()
 
     }
 
@@ -149,6 +176,12 @@ class WordsInDetailFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         mediaPlayer = MediaPlayer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: YES")
+        fragmentLayout.disposeFragmentManager()
     }
     override fun onStop() {
         super.onStop()
