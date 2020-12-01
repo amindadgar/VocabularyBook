@@ -1,6 +1,7 @@
 package com.amindadgar.mydictionary.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -10,6 +11,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.Utils.WordsRecycler.RecyclerTouchListener
 import com.amindadgar.mydictionary.Utils.WordsRecycler.WordRecyclerAdapter
@@ -84,7 +87,16 @@ class MainActivity : AppCompatActivity() {
 
         initFab()
         recyclerViewListener(recyclerViewAdapter)
-
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 1){
+                    fab.hide()
+                }
+                if (dy < -1)
+                    fab.show()
+            }
+        })
 
 
         /**        This part is For FireBase and it's commented
@@ -102,6 +114,8 @@ class MainActivity : AppCompatActivity() {
 //                    val mytexts = textView.text
 //                    textView.text = "$mytexts \n\nFailed Syncing Data\n${e.printStackTrace()}"
                 }
+
+
 
 
     }
@@ -262,7 +276,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun request(word: String){
         progressBar.visibility = View.VISIBLE
         try {
