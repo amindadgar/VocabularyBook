@@ -22,10 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="12dp"
-        android:backgroundTint="@color/Black50"
+        android:backgroundTint="@color/gray0"
         android:elevation="12dp"
         android:src="@drawable/icon_add"
-        android:tint="@color/gray0" />
+        android:tint="@color/Black80" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,6 +39,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:elevation="4dp"
+            android:background="@color/gray0"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layoutDirection="ltr">
