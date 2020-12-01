@@ -109,7 +109,7 @@ class WordsInDetailFragment : Fragment() {
                     soundUri = it.phoneticAudio
                 }
                 if (lastSynonym != it.synonym)
-                    synonymText.text = "${synonymText.text}\n${it.synonym}"
+                    synonymText.text = "${synonymText.text}  ${it.synonym}"
 
                 lastDefinition = it.definition
                 lastPhonetics = it.phoneticText

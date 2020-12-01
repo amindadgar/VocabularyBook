@@ -74,8 +74,8 @@ class MainActivity : AppCompatActivity() {
 
         wordsViewModel.allWords.observe(this, Observer { words ->
             words?.let {
-                recyclerViewAdapter.setWords(words as ArrayList<WordDefinitionTuple>)
-                linearLayoutManager.scrollToPosition(words.size - 1)
+                val size = recyclerViewAdapter.setWords(words as ArrayList<WordDefinitionTuple>)
+                linearLayoutManager.scrollToPosition(size -1)
 
             }
 

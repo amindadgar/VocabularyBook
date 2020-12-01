@@ -62,12 +62,14 @@ class WordRecyclerAdapter(
         val definitionTextView: TextView = itemView.findViewById(R.id.definition_TextView)
 
     }
-    internal fun setWords(data: ArrayList<WordDefinitionTuple>){
+    // set new words and return it's position
+    internal fun setWords(data: ArrayList<WordDefinitionTuple>):Int{
         this.data = data
-        initializeItems()
+        val size = initializeItems()
         notifyDataSetChanged()
+        return size
     }
-    private fun initializeItems(){
+    private fun initializeItems():Int{
         var i = 0
         var lastWord = ""
         wordsData.clear()
@@ -85,6 +87,7 @@ class WordRecyclerAdapter(
             }
             Log.d(TAG, "WORD: ${wordDefinitionTuple.words}")
         }
+        return wordsData.size
     }
     fun deleteWord(position: Int):WordDefinitionTuple{
         // save data in tmp variable to return it
