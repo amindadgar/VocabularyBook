@@ -100,7 +100,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
     }
     private fun insertDatas(data :ArrayList<DictionaryData>,id:Int){
         this.insertWords(Words(id,data[0].word))
-        var synonymAvailable = false
+        var synonymString = ""
 
         for (meanings in data[0].meanings){
             for (definition in meanings.defenitions){
@@ -131,21 +131,30 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
                 }
                 if (!definition.synonyms.isNullOrEmpty()) {
                     for (synonyms in definition.synonyms) {
+                        synonymString += synonyms
                         Log.d("Dictionary synonym",synonyms)
-                        this.insertSynonym(Synonym(id,synonyms))
-                        synonymAvailable = true
                     }
                 }
             }
-            if (!synonymAvailable)
+            if (synonymString == "")
                 this.insertSynonym(Synonym(id,"No Synonyms available"))
+            else
+                this.insertSynonym(Synonym(id,synonymString))
         }
-        for (phonetics in data[0].phonetics){
-            Log.d("Dictionary phonetics",phonetics.phonetic)
+
+        // in case there was no phonetics available
+        if (data[0].phonetics.isNotEmpty())
+            for (phonetics in data[0].phonetics){
+                Log.d("Dictionary phonetics",phonetics.phonetic)
+                Log.d(TAG, "Dictionary phonetics: YES")
+                this.insertPhonetics(Phonetics(
+                    phonetics.phonetic,phonetics.audio,id
+                ))
+            }
+        else
             this.insertPhonetics(Phonetics(
-                phonetics.phonetic,phonetics.audio,id
+                "unavailable","unavailable",id
             ))
-        }
     }
 
 

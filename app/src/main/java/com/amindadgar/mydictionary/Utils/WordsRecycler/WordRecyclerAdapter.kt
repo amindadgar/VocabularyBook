@@ -93,8 +93,8 @@ class WordRecyclerAdapter(
         // save data in tmp variable to return it
         // by returning data we will tell that we removed the selected item
         Log.d(TAG, "deleteWord: Deleting from recyclerView")
-        val tmp = data[position]
-        data.removeAt(position)
+        val tmp = wordsData[position]
+        wordsData.removeAt(position)
         notifyDataSetChanged()
         return tmp
     }
