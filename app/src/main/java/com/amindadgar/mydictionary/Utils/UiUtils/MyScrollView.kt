@@ -3,12 +3,19 @@ package com.amindadgar.mydictionary.Utils.UiUtils
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentManager
+import kotlin.math.abs
 
-class MyScrollView(context:Context,attributeSet: AttributeSet?):NestedScrollView(context,attributeSet){
+
+class MyScrollView(context: Context, attributeSet: AttributeSet?):NestedScrollView(
+    context,
+    attributeSet
+){
     private val DEBUG_TAG = "myScrollView"
     private var mVelocityTracker: VelocityTracker? = null
     private var fragmentManager:FragmentManager?=null
@@ -40,6 +47,7 @@ class MyScrollView(context:Context,attributeSet: AttributeSet?):NestedScrollView
 
         return when (action) {
             MotionEvent.ACTION_DOWN -> {
+
                 Log.d(DEBUG_TAG, "Action was DOWN")
                 // Reset the velocity tracker back to its initial state.
                 mVelocityTracker?.clear()
@@ -63,11 +71,12 @@ class MyScrollView(context:Context,attributeSet: AttributeSet?):NestedScrollView
                     // Best practice to use VelocityTrackerCompat where possible.
                     val xVelocity = getXVelocity(pointerId)
                     val yVelocity = getYVelocity(pointerId)
-                    if ((xVelocity - yVelocity)< - 20000)
+                    Log.d(DEBUG_TAG, "myGestureDetector Y: $scrollY")
+                    Log.d(DEBUG_TAG, "myGestureDetector X: $scrollX")
+                    if (abs(xVelocity) > 1000 && scrollY < 10 )
                         fragmentManager!!.popBackStack()
 
-                    Log.d(DEBUG_TAG, "differ x - y: ${xVelocity - yVelocity}")
-//                    Log.d(DEBUG_TAG, "Y velocity: ${getYVelocity(pointerId)}")
+                    Log.d(DEBUG_TAG, "myGestureDetector xVelocity: ${abs(xVelocity) }")
                 }
                 true
             }
