@@ -98,4 +98,15 @@ class WordRecyclerAdapter(
         notifyDataSetChanged()
         return tmp
     }
+
+    // if the word entered was duplicate we would scroll to its position
+    fun getItemPosition(word:String):Int{
+        wordsData.forEachIndexed { index, wordDefinitionTuple ->
+            if (wordDefinitionTuple.words == word){
+                return index
+            }
+        }
+        // We Would NEVER reach here cause this function is called when the word is duplicated!
+        return wordsData.size - 1
+    }
 }

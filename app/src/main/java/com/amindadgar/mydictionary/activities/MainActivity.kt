@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var fab:FloatingActionButton
     private val TAG = "MainActivity"
     val REQUEST_AUDIO_CODE = 100
+    private lateinit var recyclerViewAdapter:WordRecyclerAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         wordsViewModel = ViewModelProviders.of(this).get(WordsViewModel::class.java)
 
-        val recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
+        recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
 
         recyclerView.adapter = recyclerViewAdapter
         val linearLayoutManager = LinearLayoutManager(this)
@@ -237,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                     if (word[word.length - 1] == ' ') {
                         word = word.substring(0..word.length - 2)
                     }
+
                     request(word)
                 }else{
                     Toast.makeText(this,"Please enter your word",Toast.LENGTH_SHORT).show()
@@ -264,44 +266,53 @@ class MainActivity : AppCompatActivity() {
     private fun request(word: String){
         progressBar.visibility = View.VISIBLE
         try {
-            //get text from editText
-            // request data and if there was no connection error save it to database
-            CoroutineScope(Dispatchers.IO).launch {
-                var requestCode = -1
+            // first of all check if the word is duplicate or not!
+            val wordIsAvailable = wordsViewModel.checkWords(word)
+            if (!wordIsAvailable) {
+                //get text from editText
+                // request data and if there was no connection error save it to database
+                CoroutineScope(Dispatchers.IO).launch {
+                    var requestCode = -1
 
-                // if nothing was entered set request code -12
-                requestCode = if (!word.isBlank())
-                    wordsViewModel.getWord(word, id)
-                else
-                    -12
+                    // if nothing was entered set request code -12
+                    requestCode = if (!word.isBlank())
+                        wordsViewModel.getWord(word, id)
+                    else
+                        -12
 
-                when (requestCode) {
-                    200 -> {
-                        //increase id and save it when the activity is paused
-                        id++
-                        sharePreferenceEditor.putInt("IdNum", id).apply()
-                        withContext(Dispatchers.Main) {
-                            progressBar.visibility = View.GONE
+                    when (requestCode) {
+                        200 -> {
+                            //increase id and save it when the activity is paused
+                            id++
+                            sharePreferenceEditor.putInt("IdNum", id).apply()
+                            withContext(Dispatchers.Main) {
+                                progressBar.visibility = View.GONE
+                            }
                         }
-                    }
-                    -12 -> {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(this@MainActivity, "Empty word!", Toast.LENGTH_LONG)
-                                .show()
-                            progressBar.visibility = View.GONE
+                        -12 -> {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(this@MainActivity, "Empty word!", Toast.LENGTH_LONG)
+                                    .show()
+                                progressBar.visibility = View.GONE
+                            }
                         }
-                    }
-                    else -> {
-                        withContext(Dispatchers.Main){
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Error fetching data\nCode: $requestCode",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            progressBar.visibility = View.GONE
+                        else -> {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Error fetching data\nCode: $requestCode",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                progressBar.visibility = View.GONE
+                            }
                         }
                     }
                 }
+            }else {
+                progressBar.visibility = View.GONE
+                Toast.makeText(this, "Duplicate word", Toast.LENGTH_LONG).show()
+                val itemPosition = recyclerViewAdapter.getItemPosition(word)
+                recyclerView.scrollToPosition(itemPosition)
             }
 
         }catch (ex: Exception){

@@ -49,6 +49,15 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
         }
     }
 
+    // if checkWords function return true means that we already have the word
+    fun checkWords(word: String):Boolean{
+        allWords.value!!.forEach {
+            if (it.words == word)
+                return true
+        }
+        return false
+    }
+
     fun deleteAll(){
         // if all data was removed, reset numbering
         val editor = context.getSharedPreferences("sharedPrefs",Context.MODE_PRIVATE).edit()
