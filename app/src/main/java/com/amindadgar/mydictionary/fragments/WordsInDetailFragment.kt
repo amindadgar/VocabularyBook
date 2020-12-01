@@ -143,8 +143,12 @@ class WordsInDetailFragment : Fragment() {
             }
         }catch (ex:IOException){
             ex.printStackTrace()
+            changeVolumeButton(false)
+            Toast.makeText(requireActivity(),"Error playing audio",Toast.LENGTH_LONG).show()
         }catch (ex:IllegalArgumentException){
             ex.printStackTrace()
+            changeVolumeButton(false)
+            Toast.makeText(requireActivity(),"Error playing audio",Toast.LENGTH_LONG).show()
         }
 
     }
