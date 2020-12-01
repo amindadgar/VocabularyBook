@@ -25,6 +25,7 @@
         android:backgroundTint="@color/gray0"
         android:elevation="12dp"
         android:src="@drawable/icon_add"
+        app:backgroundTint="@color/gray0"
         android:tint="@color/Black80" />
 
     <LinearLayout
