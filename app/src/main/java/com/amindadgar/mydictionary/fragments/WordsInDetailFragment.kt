@@ -1,6 +1,7 @@
 package com.amindadgar.mydictionary.fragments
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.AnimationDrawable
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
@@ -47,6 +48,9 @@ class WordsInDetailFragment : Fragment() {
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var fragmentLayout:MyScrollView
 
+    // this variable is to animate voice icon
+    private lateinit var voiceAnimation: AnimationDrawable
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -66,7 +70,6 @@ class WordsInDetailFragment : Fragment() {
         fragmentLayout.initializeFragmentManager(requireActivity().supportFragmentManager)
     }
 
-//    @SuppressLint("ClickableViewAccessibility")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(WordsInDetailViewModel::class.java)
@@ -154,20 +157,27 @@ class WordsInDetailFragment : Fragment() {
     }
     // this functions are to change the behaviour of volume button when to start voice or end it!
     private fun changeVolumeButton(enable:Boolean){
-        if (enable)
-            soundIcon.animate().apply {
-                alpha(2f)
-                scaleY(1.3f)
-                scaleX(1.3f)
-                duration = 100
-            }.start()
+        soundIcon.apply {
+            setBackgroundResource(R.drawable.icon_voice_animation)
+            voiceAnimation = background as AnimationDrawable
+        }
+        if (enable) {
+            voiceAnimation.start()
+//            soundIcon.animate().apply {
+//                alpha(2f)
+//                scaleY(1.3f)
+//                scaleX(1.3f)
+//                duration = 100
+//            }.start()
+        }
         else
-            soundIcon.animate().apply {
-                alpha(1f)
-                scaleY(1f)
-                scaleX(1f)
-                duration = 400
-            }.start()
+            voiceAnimation.stop()
+//            soundIcon.animate().apply {
+//                alpha(1f)
+//                scaleY(1f)
+//                scaleX(1f)
+//                duration = 400
+//            }.start()
 
     }
 

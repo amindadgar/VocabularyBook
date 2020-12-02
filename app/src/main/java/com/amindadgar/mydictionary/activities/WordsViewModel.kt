@@ -131,7 +131,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
                 }
                 if (!definition.synonyms.isNullOrEmpty()) {
                     for (synonyms in definition.synonyms) {
-                        synonymString += synonyms
+                        synonymString += "$synonyms,   "
                         Log.d("Dictionary synonym",synonyms)
                     }
                 }
