@@ -17,6 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.VelocityTrackerCompat.getXVelocity
 import androidx.core.view.VelocityTrackerCompat.getYVelocity
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.Utils.UiUtils.MyScrollView
@@ -37,7 +38,10 @@ class WordsInDetailFragment : Fragment() {
         }
     }
     private var TAG = "WordsInDetailFragment"
-    private lateinit var viewModel: WordsInDetailViewModel
+
+    // instantiate ViewModel with this fragment
+    val viewModel:WordsInDetailViewModel by viewModels<WordsInDetailViewModel>()
+
 
     private lateinit var definitionText:TextView
     private lateinit var sampleSentenceText:TextView
@@ -72,18 +76,6 @@ class WordsInDetailFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(WordsInDetailViewModel::class.java)
-
-//        fragmentLayout.setOnTouchListener { view, motionEvent ->
-//            when(motionEvent.action){
-//                MotionEvent.ACTION_MOVE -> {
-//                    val actionType = motionEvent.action
-//                    Log.d(TAG, "onActivityCreated: ACTION_OUTSIDE")
-//                    true
-//                }
-//                else -> true
-//            }
-//        }
 
 
         val id = requireArguments().getInt("ID")
@@ -122,6 +114,7 @@ class WordsInDetailFragment : Fragment() {
         })
 
         soundIcon.setOnClickListener {
+            Toast.makeText(requireActivity(),"playing audio ...",Toast.LENGTH_LONG).show()
             changeVolumeButton(true)
             initializeAudio(Uri.parse(soundUri))
         }
@@ -163,21 +156,10 @@ class WordsInDetailFragment : Fragment() {
         }
         if (enable) {
             voiceAnimation.start()
-//            soundIcon.animate().apply {
-//                alpha(2f)
-//                scaleY(1.3f)
-//                scaleX(1.3f)
-//                duration = 100
-//            }.start()
         }
         else
             voiceAnimation.stop()
-//            soundIcon.animate().apply {
-//                alpha(1f)
-//                scaleY(1f)
-//                scaleX(1f)
-//                duration = 400
-//            }.start()
+
 
     }
 

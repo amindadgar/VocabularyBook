@@ -67,11 +67,10 @@
                     android:id="@+id/sound_play"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:translationZ="-1dp"
                     android:layout_gravity="top|center_horizontal"
                     android:layout_marginTop="10dp"
                     android:src="@drawable/icon_voice_animation"
-                    app:tint="@color/Black60" />
+                    />
             </LinearLayout>
         </LinearLayout>
 

@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -41,7 +42,8 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var wordsViewModel:WordsViewModel
+    // instantiate ViewModel
+    private val wordsViewModel:WordsViewModel by viewModels()
     private var id:Int = 0
     private lateinit var sharePreferenceEditor: SharedPreferences.Editor
     lateinit var fab:FloatingActionButton
@@ -63,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         sharePreferenceEditor = sharedPreferences.edit()
         id = sharedPreferences.getInt("IdNum", 0)
 
-        wordsViewModel = ViewModelProviders.of(this).get(WordsViewModel::class.java)
 
         recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
 
