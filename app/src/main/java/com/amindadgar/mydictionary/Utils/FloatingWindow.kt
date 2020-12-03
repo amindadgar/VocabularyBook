@@ -2,6 +2,7 @@ package com.amindadgar.mydictionary.Utils
 
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Point
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.Gravity
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import com.amindadgar.mydictionary.R
+import com.amindadgar.mydictionary.Utils.UiUtils.DraggableTouchListener
 
 
 class FloatingWindow (private val context: Context) {
@@ -17,6 +19,19 @@ class FloatingWindow (private val context: Context) {
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val rootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
 
+    init {
+        rootView.findViewById<View>(R.id.FloatingWindowContainer).registerDraggableTouchListener(
+            initialPosition = { Point(windowParams.x, windowParams.y) },
+            positionListener = { x, y -> setPosition(x, y) }
+        )
+    }
+
+    fun View.registerDraggableTouchListener(
+        initialPosition: () -> Point,
+        positionListener: (x: Int, y: Int) -> Unit
+    ) {
+        DraggableTouchListener(context, this, initialPosition, positionListener)
+    }
     private val windowParams = WindowManager.LayoutParams(0,0,0,0
     ,if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -28,8 +43,13 @@ class FloatingWindow (private val context: Context) {
                 WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
         PixelFormat.TRANSLUCENT)
     private fun getCurrentDisplayMetrics():DisplayMetrics{
-        val dm = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(dm)
+        var dm = DisplayMetrics()
+        // get Window metrics
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            windowManager.defaultDisplay.getMetrics(dm)
+        else
+           dm = context.resources.displayMetrics
+
         return dm
     }
     private fun calculateSizeAndPosition(
@@ -47,7 +67,7 @@ class FloatingWindow (private val context: Context) {
     }
 
     private fun initWindowParams() {
-        calculateSizeAndPosition(windowParams, 300, 80)
+        calculateSizeAndPosition(windowParams, 300, 150)
     }
 
     private fun initWindow() {
@@ -79,6 +99,18 @@ class FloatingWindow (private val context: Context) {
         } catch (e: Exception) {
             // Ignore exception for now, but in production, you should have some
             // warning for the user here.
+        }
+    }
+    private fun setPosition(x:Int,y:Int){
+        windowParams.x = x
+        windowParams.y = y
+        update()
+    }
+    private fun update(){
+        try {
+            windowManager.updateViewLayout(rootView,windowParams)
+        }catch (ex:Exception){
+            ex.printStackTrace()
         }
     }
 
