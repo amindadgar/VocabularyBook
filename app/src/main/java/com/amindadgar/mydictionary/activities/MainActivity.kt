@@ -1,7 +1,6 @@
 package com.amindadgar.mydictionary.activities
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,7 +10,6 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
@@ -19,9 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.amindadgar.mydictionary.Application
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.Utils.WordsRecycler.RecyclerTouchListener
 import com.amindadgar.mydictionary.Utils.WordsRecycler.WordRecyclerAdapter
@@ -79,7 +77,8 @@ class MainActivity : AppCompatActivity() {
 
         wordsViewModel.allWords.observe(this, Observer { words ->
             words?.let {
-                val size = recyclerViewAdapter.setWords(words as ArrayList<WordDefinitionTuple>)
+                val data = wordsViewModel.initializeItems(words as ArrayList<WordDefinitionTuple>)
+                val size = recyclerViewAdapter.setWords(data)
                 linearLayoutManager.scrollToPosition(size -1)
 
             }

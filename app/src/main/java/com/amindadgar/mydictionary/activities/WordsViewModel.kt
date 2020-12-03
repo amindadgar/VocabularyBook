@@ -21,10 +21,33 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
     val context:Context = application.applicationContext
     private val TAG = "WordsViewModel"
 
+    private var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf()
+
     init {
         val wordDao = WordRoomDatabase.getInstance(application,viewModelScope).WordsDao()
         repository = WordsRepository(wordDao)
         allWords = repository.wordDefinition
+    }
+    // this function is used to arrange data for showing to user
+    fun initializeItems(allWords:ArrayList<WordDefinitionTuple>):ArrayList<WordDefinitionTuple>{
+        var i = 0
+        var lastWord = ""
+        wordsData.clear()
+            allWords.forEach{ wordDefinitionTuple ->
+                if (lastWord != wordDefinitionTuple.words){
+                    lastWord = wordDefinitionTuple.words
+                    wordsData.add(i++,wordDefinitionTuple)
+                }else{
+                    val tempIndex = i - 1
+                    wordsData[tempIndex] = WordDefinitionTuple(wordsData[tempIndex].id
+                        ,wordsData[tempIndex].words
+                        ,wordsData[tempIndex].definitions + "\n\n" + wordDefinitionTuple.definitions)
+//                    Log.d(TAG, "initializeItems id: ${wordsData[tempIndex].id}")
+//                    Log.d(TAG, "initializeItems definition: ${wordsData[tempIndex].definitions}")
+                }
+//                Log.d(TAG, "WORD: ${wordDefinitionTuple.words}")
+            }
+        return wordsData
     }
 
     fun insert(words: Words, definition: Definition, phonetics: Phonetics, Synonym: Synonym) = viewModelScope.launch {
