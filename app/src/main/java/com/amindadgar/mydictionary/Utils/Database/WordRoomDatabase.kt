@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
     entities = [Words::class,Definition::class,Phonetics::class,Synonym::class]
     ,version = 2
     ,exportSchema = false
-    ,views = [AllData::class]
+
 )
 abstract class WordRoomDatabase :RoomDatabase(){
     abstract fun WordsDao():WordsDao
@@ -54,6 +54,7 @@ abstract class WordRoomDatabase :RoomDatabase(){
                     "word_database"
                 )
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
                Instance = instance
                 instance
@@ -63,6 +64,11 @@ abstract class WordRoomDatabase :RoomDatabase(){
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE VIEW IF NOT EXISTS `AllData` AS SELECT id,word,definitions,example,synonym,audio,text FROM Words JOIN Definition JOIN Synonym JOIN Phonetics WHERE Words.id = Definition.word_id AND Synonym.word_id = Words.id AND Phonetics.word_id = Words.id")
+            }
+        }
+        val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP VIEW `AllData`")
             }
         }
     }

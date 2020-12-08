@@ -66,26 +66,7 @@ class WordRecyclerAdapter(
         notifyDataSetChanged()
         return size
     }
-//    private fun initializeItems():Int{
-//        var i = 0
-//        var lastWord = ""
-//        wordsData.clear()
-//        data.forEach{ wordDefinitionTuple ->
-//            if (lastWord != wordDefinitionTuple.words){
-//                lastWord = wordDefinitionTuple.words
-//                wordsData.add(i++,wordDefinitionTuple)
-//            }else{
-//                val tempIndex = i - 1
-//                wordsData[tempIndex] = WordDefinitionTuple(wordsData[tempIndex].id
-//                    ,wordsData[tempIndex].words
-//                    ,wordsData[tempIndex].definitions + "\n\n" + wordDefinitionTuple.definitions)
-//                Log.d(TAG, "initializeItems id: ${wordsData[tempIndex].id}")
-//                Log.d(TAG, "initializeItems definition: ${wordsData[tempIndex].definitions}")
-//            }
-//            Log.d(TAG, "WORD: ${wordDefinitionTuple.words}")
-//        }
-//        return wordsData.size
-//    }
+
     fun deleteWord(position: Int):WordDefinitionTuple{
         // save data in tmp variable to return it
         // by returning data we will tell that we removed the selected item
