@@ -28,6 +28,10 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
         repository = WordsRepository(wordDao)
         allWords = repository.wordDefinition
     }
+    fun initializeFloatingWindow(){
+        // initialize items in application class
+        com.amindadgar.mydictionary.Application().initializeFloatingWindow(wordsData)
+    }
     // this function is used to arrange data for showing to user
     fun initializeItems(allWords:ArrayList<WordDefinitionTuple>):ArrayList<WordDefinitionTuple>{
         var i = 0
@@ -66,11 +70,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
     private fun insertWords(words: Words) = viewModelScope.launch {
         repository.insertWords(words)
     }
-    fun getAllData(id: Int):LiveData<List<AllData>>{
-        return runBlocking(viewModelScope.coroutineContext) {
-             repository.getAllData(id)
-        }
-    }
+
 
     // if checkWords function return true means that we already have the word
     fun checkWords(word: String):Boolean{
@@ -154,7 +154,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
                 }
                 if (!definition.synonyms.isNullOrEmpty()) {
                     for (synonyms in definition.synonyms) {
-                        synonymString += "$synonyms,   "
+                        synonymString += "$synonyms, "
                         Log.d("Dictionary synonym",synonyms)
                     }
                 }

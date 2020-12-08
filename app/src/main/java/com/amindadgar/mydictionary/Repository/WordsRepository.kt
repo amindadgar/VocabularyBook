@@ -29,9 +29,17 @@ class WordsRepository(private val wordDao:WordsDao) {
     suspend fun deleteData() {
         wordDao.deleteAll()
     }
-    suspend fun getAllData(id:Int):LiveData<List<AllData>>{
-        return wordDao.loadAllData(id)
+
+    suspend fun loadSynonym(id: Int):LiveData<List<String>>{
+        return wordDao.loadSynonym(id)
     }
+    suspend fun loadPhonetics(id: Int):LiveData<List<Phonetics>>{
+        return wordDao.loadPhonetics(id)
+    }
+    suspend fun loadDefinitionExamples(id: Int):LiveData<List<Definition>>{
+        return wordDao.loadDefinitionExamples(id)
+    }
+
 
     suspend fun deleteWord(word: Words) = wordDao.deleteWord(word)
 }

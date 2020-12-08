@@ -1,22 +1,17 @@
 package com.amindadgar.mydictionary.fragments
 
-import android.annotation.SuppressLint
 import android.graphics.drawable.AnimationDrawable
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.animation.Animation
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.VelocityTrackerCompat.getXVelocity
-import androidx.core.view.VelocityTrackerCompat.getYVelocity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.amindadgar.mydictionary.R
@@ -44,11 +39,10 @@ class WordsInDetailFragment : Fragment() {
 
 
     private lateinit var definitionText:TextView
-    private lateinit var sampleSentenceText:TextView
     private lateinit var phoneticsText:TextView
     private lateinit var synonymText:TextView
     private lateinit var wordTextView: TextView
-    private lateinit var soundIcon:ImageView
+    private lateinit var soundIcon:com.airbnb.lottie.LottieAnimationView
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var fragmentLayout:MyScrollView
 
@@ -65,7 +59,6 @@ class WordsInDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         definitionText = view.findViewById(R.id.definition_text)
-        sampleSentenceText = view.findViewById(R.id.sample_sentence_text)
         phoneticsText = view.findViewById(R.id.phonetics_text)
         synonymText = view.findViewById(R.id.synonym_text)
         wordTextView = view.findViewById(R.id.word_TextView)
@@ -84,33 +77,35 @@ class WordsInDetailFragment : Fragment() {
         var soundUri = ""
         Log.d("APPLICATION id",id.toString())
 
-        // this variables are set for repeated values !
-        var lastDefinition = ""
-        var lastPhonetics = ""
-        var lastSampleSentence = ""
-        var lastSynonym = ""
-        viewModel.getAllData(id).observe(viewLifecycleOwner, Observer { allDataList ->
-            allDataList.forEach {
-                //check that values won't repeat !
-                // because THE database View is not set properly our data is repeated!
 
-                Log.d("APPLICATION Definition",it.definition)
-                if (lastDefinition != it.definition)
-                    definitionText.text =  "${definitionText.text} \n${it.definition}\n"
-                if (lastSampleSentence != it.example_sentence)
-                    sampleSentenceText.text = "${sampleSentenceText.text} \n${it.example_sentence}\n"
-                if (lastPhonetics != it.phoneticText) {
-                    phoneticsText.text = "${phoneticsText.text}\n${it.phoneticText}"
-                    soundUri = it.phoneticAudio
-                }
-                if (lastSynonym != it.synonym)
-                    synonymText.text = "${synonymText.text}  ${it.synonym}"
+        viewModel.getDefinitionExamples(id).observe(viewLifecycleOwner, Observer { dataList ->
+            var stringBuilder = ""
+            dataList.forEachIndexed { index, data ->
+                // first item is the definition
+                // second is the sample sentence
+                stringBuilder += "${data.definition}\n"
+                if (data.sampleSentence.isNotBlank())
+                    stringBuilder += "ex: ${data.sampleSentence}\n\n"
+                else
+                    stringBuilder +="\n"
 
-                lastDefinition = it.definition
-                lastPhonetics = it.phoneticText
-                lastSampleSentence = it.example_sentence
-                lastSynonym = it.synonym
             }
+            definitionText.text = stringBuilder
+        })
+        viewModel.getPhonetics(id).observe(viewLifecycleOwner, Observer { list ->
+            // first item is phonetics text
+            // second is phonetics uri
+            list.forEach {
+                phoneticsText.text = it.text
+                soundUri = it.audio
+            }
+        })
+        viewModel.getSynonym(id).observe(viewLifecycleOwner, Observer { list ->
+            var synonyms = ""
+            list.forEach {
+                synonyms = "$it\n"
+            }
+            synonymText.text = synonyms
         })
 
         soundIcon.setOnClickListener {
@@ -120,7 +115,8 @@ class WordsInDetailFragment : Fragment() {
         }
     }
 
-    fun initializeAudio(uri: Uri){
+
+    private fun initializeAudio(uri: Uri){
         try {
 
             mediaPlayer = MediaPlayer().apply {
@@ -150,16 +146,16 @@ class WordsInDetailFragment : Fragment() {
     }
     // this functions are to change the behaviour of volume button when to start voice or end it!
     private fun changeVolumeButton(enable:Boolean){
-        soundIcon.apply {
-            setBackgroundResource(R.drawable.icon_voice_animation)
-            voiceAnimation = background as AnimationDrawable
-        }
+//        soundIcon.apply {
+//            setBackgroundResource(R.drawable.icon_voice_animation)
+//            voiceAnimation = background as AnimationDrawable
+//        }
         if (enable) {
-            voiceAnimation.start()
+            soundIcon.playAnimation()
+//            voiceAnimation.start()
         }
         else
-            voiceAnimation.stop()
-
+            soundIcon.pauseAnimation()
 
     }
 

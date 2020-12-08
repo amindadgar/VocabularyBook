@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                 val size = recyclerViewAdapter.setWords(data)
                 linearLayoutManager.scrollToPosition(size -1)
 
+//                wordsViewModel.initializeFloatingWindow()
             }
 
         })

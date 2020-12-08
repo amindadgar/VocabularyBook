@@ -9,21 +9,59 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.Utils.UiUtils.DraggableTouchListener
+import com.amindadgar.mydictionary.model.RoomDatabaseModel.WordDefinitionTuple
 
 
-class FloatingWindow (private val context: Context) {
+class FloatingWindow (private val context: Context,private var data: ArrayList<WordDefinitionTuple>) {
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val rootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
+    private var index = 0
+
+    private val WordTextView:TextView
+    private val DefinitionTextView:TextView
+
 
     init {
+        initWindowParams()
+        initWindow()
+        WordTextView = rootView.findViewById<TextView>(R.id.word_TextView)
+        DefinitionTextView = rootView.findViewById<TextView>(R.id.definition_text)
+
         rootView.findViewById<View>(R.id.FloatingWindowContainer).registerDraggableTouchListener(
             initialPosition = { Point(windowParams.x, windowParams.y) },
             positionListener = { x, y -> setPosition(x, y) }
         )
+        // initialize first item
+        setWord(data[0].words,data[0].definitions)
+        initClickListeners()
+    }
+    fun refreshData(data: ArrayList<WordDefinitionTuple>){
+        this.data = data
+        setWord(data[0].words,data[0].definitions)
+    }
+    private fun setWord(word:String,Definition:String){
+        WordTextView.text = word
+        DefinitionTextView.text = Definition
+    }
+    // this function is for initializing next or previous button click Listeners
+    private fun initClickListeners(){
+        rootView.findViewById<View>(R.id.next_icon).setOnClickListener {
+            // if all words was shown start from zero
+            index = (index + 1) % (data.size - 1)
+
+            setWord(data[index].words,data[index].definitions)
+        }
+        rootView.findViewById<ImageView>(R.id.previous_icon).setOnClickListener {
+            // check data size bounds
+            index = (index - 1) % (data.size - 1)
+            setWord(data[index].words,data[index].definitions)
+        }
     }
 
     fun View.registerDraggableTouchListener(
@@ -67,21 +105,17 @@ class FloatingWindow (private val context: Context) {
     }
 
     private fun initWindowParams() {
+        // initialize window with width = 300 and height = 150
         calculateSizeAndPosition(windowParams, 300, 150)
     }
 
     private fun initWindow() {
         // Using kotlin extension for views caused error, so good old findViewById is used
         rootView.findViewById<View>(R.id.closeIcon).setOnClickListener { close() }
-        rootView.findViewById<View>(R.id.next_icon).setOnClickListener {
-            Toast.makeText(context, "Adding notes to be implemented.", Toast.LENGTH_SHORT).show()
-        }
+
     }
 
-    init {
-        initWindowParams()
-        initWindow()
-    }
+
 
     fun open() {
         try {

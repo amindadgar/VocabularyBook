@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 // Annotates class to be a Room Database with a table (entity) of the Word class
 @Database(
     entities = [Words::class,Definition::class,Phonetics::class,Synonym::class]
-    ,version = 2
+    ,version = 3
     ,exportSchema = false
 
 )
