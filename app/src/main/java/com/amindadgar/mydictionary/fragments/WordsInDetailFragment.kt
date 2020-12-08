@@ -46,8 +46,6 @@ class WordsInDetailFragment : Fragment() {
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var fragmentLayout:MyScrollView
 
-    // this variable is to animate voice icon
-    private lateinit var voiceAnimation: AnimationDrawable
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,9 +78,7 @@ class WordsInDetailFragment : Fragment() {
 
         viewModel.getDefinitionExamples(id).observe(viewLifecycleOwner, Observer { dataList ->
             var stringBuilder = ""
-            dataList.forEachIndexed { index, data ->
-                // first item is the definition
-                // second is the sample sentence
+            dataList.forEach { data ->
                 stringBuilder += "${data.definition}\n"
                 if (data.sampleSentence.isNotBlank())
                     stringBuilder += "ex: ${data.sampleSentence}\n\n"
@@ -146,17 +142,11 @@ class WordsInDetailFragment : Fragment() {
     }
     // this functions are to change the behaviour of volume button when to start voice or end it!
     private fun changeVolumeButton(enable:Boolean){
-//        soundIcon.apply {
-//            setBackgroundResource(R.drawable.icon_voice_animation)
-//            voiceAnimation = background as AnimationDrawable
-//        }
         if (enable) {
             soundIcon.playAnimation()
-//            voiceAnimation.start()
         }
         else
             soundIcon.pauseAnimation()
-
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {

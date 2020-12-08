@@ -29,6 +29,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
     packagingOptions {
         exclude 'META-INF/atomicfu.kotlin_module'
     }
@@ -51,6 +54,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
+
 
 
     //firebase library Bom
@@ -94,6 +99,9 @@ dependencies {
 
     implementation 'com.github.andreseko:sweet-alert-dialog:1.0.6'
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+    implementation 'com.labo.kaji:fragmentanimations:0.1.1'
 
+    // lottie after effects library
+    implementation "com.airbnb.android:lottie:3.5.0"
 
 }
