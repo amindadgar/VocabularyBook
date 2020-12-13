@@ -12,7 +12,6 @@ import com.amindadgar.mydictionary.Utils.WordsApi.DictionaryRetrofitBuilder
 import com.amindadgar.mydictionary.model.DictionaryApi.DictionaryData
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 
 class WordsViewModel(application: Application):AndroidViewModel(application) {
@@ -28,10 +27,7 @@ class WordsViewModel(application: Application):AndroidViewModel(application) {
         repository = WordsRepository(wordDao)
         allWords = repository.wordDefinition
     }
-    fun initializeFloatingWindow(){
-        // initialize items in application class
-        com.amindadgar.mydictionary.Application().initializeFloatingWindow(wordsData)
-    }
+
     // this function is used to arrange data for showing to user
     fun initializeItems(allWords:ArrayList<WordDefinitionTuple>):ArrayList<WordDefinitionTuple>{
         var i = 0

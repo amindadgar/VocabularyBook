@@ -73,7 +73,7 @@ class MyScrollView(context: Context, attributeSet: AttributeSet?):NestedScrollVi
                     val yVelocity = getYVelocity(pointerId)
                     Log.d(DEBUG_TAG, "myGestureDetector Y: $scrollY")
                     Log.d(DEBUG_TAG, "myGestureDetector X: $scrollX")
-                    if (abs(xVelocity) > 500 && scrollY < 10 )
+                    if (abs(xVelocity) > 800 && scrollY < 10 )
                         if (fragmentManager != null)
                             fragmentManager!!.popBackStack()
 

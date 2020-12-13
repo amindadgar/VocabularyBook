@@ -23,6 +23,16 @@ class FloatingWindow (private val context: Context,private var data: ArrayList<W
     private val rootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
     private var index = 0
 
+    private val windowParams = WindowManager.LayoutParams(0,0,0,0
+        ,if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        } else {
+            WindowManager.LayoutParams.TYPE_PHONE
+        },WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, PixelFormat.TRANSLUCENT)
+
     private val WordTextView:TextView
     private val DefinitionTextView:TextView
 
@@ -53,7 +63,9 @@ class FloatingWindow (private val context: Context,private var data: ArrayList<W
     private fun initClickListeners(){
         rootView.findViewById<View>(R.id.next_icon).setOnClickListener {
             // if all words was shown start from zero
-            index = (index + 1) % (data.size - 1)
+            if (data.size != 1) {
+                index = (index + 1) % (data.size - 1)
+            }
 
             setWord(data[index].words,data[index].definitions)
         }
@@ -66,20 +78,12 @@ class FloatingWindow (private val context: Context,private var data: ArrayList<W
 
     fun View.registerDraggableTouchListener(
         initialPosition: () -> Point,
-        positionListener: (x: Int, y: Int) -> Unit
-    ) {
+        positionListener: (x: Int, y: Int) -> Unit) {
         DraggableTouchListener(context, this, initialPosition, positionListener)
     }
-    private val windowParams = WindowManager.LayoutParams(0,0,0,0
-    ,if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            WindowManager.LayoutParams.TYPE_PHONE
-        },WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-        PixelFormat.TRANSLUCENT)
+
+
+
     private fun getCurrentDisplayMetrics():DisplayMetrics{
         var dm = DisplayMetrics()
         // get Window metrics

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -19,10 +20,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amindadgar.mydictionary.Application
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.Utils.WordsRecycler.RecyclerTouchListener
 import com.amindadgar.mydictionary.Utils.WordsRecycler.WordRecyclerAdapter
+import com.amindadgar.mydictionary.Utils.services.FloatingService
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.WordDefinitionTuple
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.Words
 import com.andreseko.SweetAlert.SweetAlertDialog
@@ -48,6 +49,8 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     val REQUEST_AUDIO_CODE = 100
     private lateinit var recyclerViewAdapter:WordRecyclerAdapter
+    private var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(WordDefinitionTuple(0,"word","definition"))
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,17 +77,23 @@ class MainActivity : AppCompatActivity() {
 
         val db = Firebase.firestore
 
-
+        var boolean = true
         wordsViewModel.allWords.observe(this, Observer { words ->
             words?.let {
                 val data = wordsViewModel.initializeItems(words as ArrayList<WordDefinitionTuple>)
                 val size = recyclerViewAdapter.setWords(data)
                 linearLayoutManager.scrollToPosition(size -1)
+                wordsData = it as ArrayList<WordDefinitionTuple>
+                if (boolean){
+                    startFloatingService()
+                    boolean = false
+                }
 
-//                wordsViewModel.initializeFloatingWindow()
+
             }
 
         })
+
 
         initFab()
         recyclerViewListener(recyclerViewAdapter)
@@ -119,6 +128,21 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    }
+
+    fun startFloatingService(command: String = "") {
+
+        val intent = Intent(this, FloatingService::class.java)
+        if (command.isNotBlank()) {
+            intent.putExtra("com.amindadgar.mydictionary", command)
+        }
+        intent.putParcelableArrayListExtra("FloatingWindowExtra",wordsData)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.startForegroundService(intent)
+        } else {
+            this.startService(intent)
+        }
     }
 
 
