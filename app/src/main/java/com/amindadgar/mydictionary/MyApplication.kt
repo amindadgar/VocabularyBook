@@ -20,7 +20,7 @@ class MyApplication :Application() {
     override fun onCreate() {
         super.onCreate()
 
-        if (this.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED) {
+        if (this.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) != PackageManager.PERMISSION_GRANTED) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
             intent.data = Uri.parse("package:" + this.packageName)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

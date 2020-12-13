@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     val REQUEST_AUDIO_CODE = 100
     private lateinit var recyclerViewAdapter:WordRecyclerAdapter
-    private var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(WordDefinitionTuple(0,"word","definition"))
+    var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(WordDefinitionTuple(0,"word","definition"))
 
 
 
@@ -85,13 +85,10 @@ class MainActivity : AppCompatActivity() {
                 linearLayoutManager.scrollToPosition(size -1)
                 wordsData = it as ArrayList<WordDefinitionTuple>
                 if (boolean){
-                    startFloatingService()
+//                    startFloatingService()
                     boolean = false
                 }
-
-
             }
-
         })
 
 
@@ -160,7 +157,6 @@ class MainActivity : AppCompatActivity() {
 
             val textView = (dialogView as LinearLayout).getChildAt(0)
             val voiceIcon = (dialogView as LinearLayout).getChildAt(1) as ImageView
-
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
                 checkVoicePermission()
@@ -269,27 +265,7 @@ class MainActivity : AppCompatActivity() {
 
 
             dialog.setConfirmClickListener {
-                Log.d("REQUEST", "DATA")
-                var word = (textView as TextView).text.toString()
-
-                if (!word.isBlank()) {
-                    // if the last of word contains space delete it
-                    if (word[word.length - 1] == ' ') {
-                        word = word.substring(0..word.length - 2)
-                    }
-
-                    request(word)
-                }else{
-                    Toast.makeText(this,"Please enter your word",Toast.LENGTH_SHORT).show()
-                }
-
-                dialog.dismiss()
-                fab.animate().apply {
-                    rotation(0f)
-                    scaleX(1f)
-                    scaleY(1f)
-                    duration = 1000
-                }
+                dialogConfirmationButtonClick(textView,dialog)
             }
             dialog.setOnDismissListener {
                 fab.animate().apply {
@@ -301,6 +277,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun dialogConfirmationButtonClick(textView:View,dialog:SweetAlertDialog){
+        Log.d("REQUEST", "DATA")
+        var word = (textView as TextView).text.toString()
+
+        if (!word.isBlank()) {
+            // if the last of word contains space delete it
+            if (word[word.length - 1] == ' ') {
+                word = word.substring(0..word.length - 2)
+            }
+
+            request(word)
+        }else{
+            Toast.makeText(this,"Please enter your word",Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.dismiss()
+        fab.animate().apply {
+            rotation(0f)
+            scaleX(1f)
+            scaleY(1f)
+            duration = 1000
+        }
+    }
+
     private fun request(word: String){
         progressBar.visibility = View.VISIBLE
         try {
@@ -368,6 +369,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,
             1f
         )
+        editText.tag = "DialogEditText"
         //setup imageView
         val imageView = ImageView(this)
         imageView.setImageResource(R.drawable.icon_mic)
