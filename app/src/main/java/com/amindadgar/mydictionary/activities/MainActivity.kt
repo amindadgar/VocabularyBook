@@ -28,8 +28,6 @@ import com.amindadgar.mydictionary.model.RoomDatabaseModel.WordDefinitionTuple
 import com.amindadgar.mydictionary.model.RoomDatabaseModel.Words
 import com.andreseko.SweetAlert.SweetAlertDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,12 +59,38 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.addFabButton)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-//        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         sharePreferenceEditor = sharedPreferences.edit()
         id = sharedPreferences.getInt("IdNum", 0)
 
+        setUpRecyclerView()
+        initFab()
+        recyclerViewListener(recyclerViewAdapter)
+        observeRecyclerViewScroll(recyclerView)
 
+
+        // FireBase is not used yet!
+//        val db = Firebase.firestore
+//        /**        This part is For FireBase and it's commented
+//         */
+//        db.collection("words")
+//                .get()
+//                .addOnSuccessListener { result ->
+//
+//                    for (document in result) {
+////                        val mytexts = textView.text
+////                        textView.text = "$mytexts\n\nId: ${document.id}\t ${document.data}\n"
+//                    }
+//                }
+//                .addOnFailureListener { e ->
+////                    val mytexts = textView.text
+////                    textView.text = "$mytexts \n\nFailed Syncing Data\n${e.printStackTrace()}"
+//                }
+
+
+    }
+
+    private fun setUpRecyclerView():Boolean{
         recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
 
         recyclerView.adapter = recyclerViewAdapter
@@ -75,59 +99,45 @@ class MainActivity : AppCompatActivity() {
         linearLayoutManager.stackFromEnd = true
         recyclerView.layoutManager = linearLayoutManager
 
-        val db = Firebase.firestore
+        observeRecyclerViewData(linearLayoutManager)
 
-        var boolean = true
+        return true
+    }
+
+    // observe recyclerView to see change hide or show the fab
+    private fun observeRecyclerViewScroll(recyclerView: RecyclerView){
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 1){
+                    setFabAsShown(false)
+                }
+                if (dy < -1)
+                    setFabAsShown(true)
+            }
+        })
+    }
+    private fun setFabAsShown(show:Boolean){
+        if (show)
+            fab.show()
+        else
+            fab.hide()
+    }
+    private fun observeRecyclerViewData(linearLayoutManager: LinearLayoutManager):Boolean{
         wordsViewModel.allWords.observe(this, Observer { words ->
             words?.let {
                 val data = wordsViewModel.initializeItems(words as ArrayList<WordDefinitionTuple>)
                 val size = recyclerViewAdapter.setWords(data)
                 linearLayoutManager.scrollToPosition(size -1)
                 wordsData = it as ArrayList<WordDefinitionTuple>
-                if (boolean){
-//                    startFloatingService()
-                    boolean = false
-                }
+
+                startFloatingService()
             }
         })
-
-
-        initFab()
-        recyclerViewListener(recyclerViewAdapter)
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 1){
-                    fab.hide()
-                }
-                if (dy < -1)
-                    fab.show()
-            }
-        })
-
-
-        /**        This part is For FireBase and it's commented
-         */
-        db.collection("words")
-                .get()
-                .addOnSuccessListener { result ->
-
-                    for (document in result) {
-//                        val mytexts = textView.text
-//                        textView.text = "$mytexts\n\nId: ${document.id}\t ${document.data}\n"
-                    }
-                }
-                .addOnFailureListener { e ->
-//                    val mytexts = textView.text
-//                    textView.text = "$mytexts \n\nFailed Syncing Data\n${e.printStackTrace()}"
-                }
-
-
-
-
+        return true
     }
 
-    fun startFloatingService(command: String = "") {
+    private fun startFloatingService(command: String = "") {
 
         val intent = Intent(this, FloatingService::class.java)
         if (command.isNotBlank()) {
@@ -142,7 +152,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // this function is used to change the appearance of voice icon
+    private fun setVoiceIconAsListening(Listening:Boolean,voiceIcon: ImageView){
+        if (Listening){
+            voiceIcon.animate().apply {
+                scaleX(1f)
+                scaleY(1f)
+                duration = 100
+            }
+        }else {
+            voiceIcon.animate().apply {
+                scaleX(0.8f)
+                scaleY(0.8f)
+                duration = 100
+            }
+        }
 
+    }
 
     private fun initFab(){
 
@@ -178,11 +204,7 @@ class MainActivity : AppCompatActivity() {
 
                  */
                 if (voiceIcon.scaleX == 0.8f) {
-                    voiceIcon.animate().apply {
-                        scaleX(1f)
-                        scaleY(1f)
-                        duration = 100
-                    }
+                    setVoiceIconAsListening(true,voiceIcon)
                     speechRecognizer.startListening(intent)
                 }
                 else {
@@ -208,10 +230,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onEndOfSpeech() {
                     Log.d(TAG, "onEndOfSpeech: Ended!")
                     speechRecognizer.stopListening()
-                    voiceIcon.animate().apply {
-                        scaleX(0.8f)
-                        scaleY(0.8f)
-                    }
+                    setVoiceIconAsListening(false,voiceIcon)
                 }
 
                 override fun onError(p0: Int) {
@@ -223,14 +242,12 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onResults(p0: Bundle?) {
+                    // just show the results as a Toast message
                     if (p0 != null) {
-                        val data: ArrayList<String>? =
-                            p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        val data: ArrayList<String>? = p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         Toast.makeText(this@MainActivity, data!!.toString(), Toast.LENGTH_LONG)
                             .show()
-
                         (textView as TextView).text = data[0]
-
                     }
 
                 }
@@ -255,25 +272,15 @@ class MainActivity : AppCompatActivity() {
             })
 
 
-            fab.animate().apply {
-                rotation(360f)
-                scaleX(0f)
-                scaleY(0f)
-                duration = 1000
-            }
+            setFabAsShown(false)
             dialog.show()
 
-
+            // set dialog listeners
             dialog.setConfirmClickListener {
                 dialogConfirmationButtonClick(textView,dialog)
             }
             dialog.setOnDismissListener {
-                fab.animate().apply {
-                    rotation(0f)
-                    scaleX(1f)
-                    scaleY(1f)
-                    duration = 1000
-                }
+                setFabAsShown(true)
             }
         }
     }
@@ -294,12 +301,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         dialog.dismiss()
-        fab.animate().apply {
-            rotation(0f)
-            scaleX(1f)
-            scaleY(1f)
-            duration = 1000
-        }
+        setFabAsShown(true)
     }
 
     private fun request(word: String){
