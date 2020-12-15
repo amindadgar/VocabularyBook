@@ -21,7 +21,6 @@ class FloatingService : Service() {
     private val CODE_FOREGROUND_SERVICE = 1
     private val CODE_EXIT_INTENT = 2
     private val CODE_NOTE_INTENT = 3
-    private var floatingWindowIsPOpen = false
     private val TAG = "FloatingWindow"
 
     private val NOTIFICATION_TEXT = "DictionaryFloatingService"
@@ -29,8 +28,8 @@ class FloatingService : Service() {
     private var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(WordDefinitionTuple(0,"word","definition"))
     private lateinit var floatingWindow:FloatingWindow
 
+
     /**
-     * @param floatingWindowIsPOpen is to get to know floatingWindow was opened or not
      * @param TAG is a Tag for logs
      * @param wordsData is an array to hold our data
      * @param floatingWindow is FloatingWindow class ( used for make floatingWindow )
@@ -49,23 +48,18 @@ class FloatingService : Service() {
     private fun stopService() {
         stopForeground(true)
         stopSelf()
-        floatingWindowIsPOpen = false
     }
 
     private fun setData(wordsData : ArrayList<WordDefinitionTuple>){
         this.wordsData = wordsData
     }
 
-    fun initializeFloatingWindow(wordsData : ArrayList<WordDefinitionTuple>){
-        floatingWindow = FloatingWindow(this,wordsData)
+    private fun initializeFloatingWindow(wordsData : ArrayList<WordDefinitionTuple>){
         setData(wordsData)
         floatingWindow.refreshData(wordsData)
-        if (!floatingWindowIsPOpen) {
+        if (!floatingWindow.getWindowStatus()) {
+            Log.d(TAG, "initializeFloatingWindow: Window is getting open")
             floatingWindow.open()
-            floatingWindowIsPOpen = true
-        }
-        else{
-            // the window is open no need to open it again
         }
 
     }
@@ -136,13 +130,22 @@ class FloatingService : Service() {
     }
 
 
+    override fun onCreate() {
+        super.onCreate()
+        floatingWindow = FloatingWindow(this,wordsData)
+
+    }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         val command = intent.getStringExtra(INTENT_COMMAND)
+
+        // we can modify window width and height by putting it's value in intent
+        val floatingWindowWidth = intent.getIntExtra("floatingWindowWidth",300)
+        val floatingWindowHeight = intent.getIntExtra("floatingWindowHeight",150)
+
         val data:ArrayList<WordDefinitionTuple> = intent.extras!!.getParcelableArrayList<WordDefinitionTuple>("FloatingWindowExtra") as ArrayList<WordDefinitionTuple>
-        Log.d(TAG, "initializeFloatingWindow: ${data.size}")
-//        Log.d(TAG, "initializeFloatingWindow: ${data[1].definitions}")
+        Log.d(TAG, "initializeFloatingWindow: data size: ${data.size}")
         // Exit the service if we receive the EXIT command.
         // START_NOT_STICKY is important here, we don't want
         // the service to be relaunched.
@@ -164,7 +167,8 @@ class FloatingService : Service() {
             ).show()
         }
 
-        initializeFloatingWindow(data)
+        if (data.size != 0)
+            initializeFloatingWindow(data)
         return START_STICKY
     }
 }

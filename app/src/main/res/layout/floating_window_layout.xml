@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/FloatingWindowContainer"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/floating_window_height"
     android:background="@drawable/shape_rounded_corners"
     android:elevation="12dp"
     android:orientation="vertical"
@@ -21,38 +21,40 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="match_parent">
 
 
         <ImageView
             android:id="@+id/previous_icon"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="previous item"
             android:layout_gravity="start|center_vertical"
             android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:translationZ="2dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="0dp"
             android:src="@android:drawable/ic_media_previous"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/Black60" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="@dimen/floating_window_width"
             android:layout_gravity="center_horizontal"
+            android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/next_icon"
-            app:layout_constraintStart_toStartOf="@+id/previous_icon"
-            app:layout_constraintTop_toTopOf="parent">
+            android:padding="6dp">
 
             <TextView
                 android:id="@+id/word_TextView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="20dp"
@@ -64,7 +66,7 @@
             <TextView
                 android:id="@+id/definition_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:scrollbars="vertical"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="12dp"
@@ -74,6 +76,7 @@
                 android:textSize="16sp" />
 
         </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <ImageView
             android:id="@+id/next_icon"
@@ -81,10 +84,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:paddingTop="6dp"
+            android:paddingStart="6dp"
+            android:translationZ="2dp"
+            android:paddingEnd="0dp"
+            android:paddingBottom="6dp"
             android:src="@android:drawable/ic_media_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/Black60" />
+            app:tint="@color/Black60"
+            android:contentDescription="Next item" />
     </FrameLayout>
 </FrameLayout>
