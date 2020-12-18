@@ -11,7 +11,7 @@ import kotlin.math.hypot
 
 class DraggableTouchListener(
     context: Context,
-    private val view:View,
+    private var view:View,
     private val initialPosition: ()-> Point,
     private val positionListener: (x:Int,y:Int) -> Unit
 ) :View.OnTouchListener{

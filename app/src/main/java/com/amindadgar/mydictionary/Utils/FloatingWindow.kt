@@ -1,15 +1,14 @@
 package com.amindadgar.mydictionary.Utils
 
+import android.animation.Animator
 import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.os.Handler
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -25,15 +24,19 @@ class FloatingWindow (private val context: Context,
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val rootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
+    private val closedRootView = layoutInflater.inflate(R.layout.floating_window_closed_layout,null)
     private var index = 0
     private val TAG = "FloatingWindow"
+    enum class WindowPosition{center, endCenter, startCenter, top, bottom}
 
 
-
-    private var windowIsClosed = false
+    // in the start the window is closed then by creating floating service we will open floating window
+    private var windowIsClosed = true
 
     /**
      * @param windowIsClosed is used to get to know is floating window close or not
+     * @param rootView is out actual window showing items
+     * @param closedRootView is a layout that used to be shown when our rootViw is closed
      */
 
     private val windowParams = WindowManager.LayoutParams(0,0,0,0
@@ -51,8 +54,18 @@ class FloatingWindow (private val context: Context,
 
 
     init {
-        initWindowParams()
         initWindow()
+        rootView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
+        )
+
+        closedRootView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
+        )
         WordTextView = rootView.findViewById<TextView>(R.id.word_TextView)
         DefinitionTextView = rootView.findViewById<TextView>(R.id.definition_text)
 
@@ -95,6 +108,10 @@ class FloatingWindow (private val context: Context,
             if (index == -1) index = data.size - 1
             setWord(data[index].words,data[index].definitions)
         }
+        closedRootView.findViewById<View>(R.id.closed_floating_window).setOnClickListener {
+            open()
+            // by clicking this icon we will open the floating Window again
+        }
     }
 
     fun View.registerDraggableTouchListener(
@@ -118,20 +135,50 @@ class FloatingWindow (private val context: Context,
     private fun calculateSizeAndPosition(
         params: WindowManager.LayoutParams,
         widthInDp: Int,
-        heightInDp: Int
+        heightInDp: Int,
+        windowPosition: WindowPosition
     ) {
         val dm = getCurrentDisplayMetrics()
         // We have to set gravity for which the calculated position is relative.
         params.gravity = Gravity.TOP or Gravity.START
         params.width = (widthInDp * dm.density).toInt()
         params.height = (heightInDp * dm.density).toInt()
-        params.x = (dm.widthPixels - params.width) / 2
-        params.y = (dm.heightPixels - params.height) / 2
+
+        setWindowPosition(params, windowPosition, dm)
+    }
+    private fun setWindowPosition(
+        params: WindowManager.LayoutParams,
+        windowPosition: WindowPosition,
+        dm :DisplayMetrics
+    ){
+        when (windowPosition){
+            WindowPosition.center ->{
+                params.x = (dm.widthPixels - params.width) / 2
+                params.y = (dm.heightPixels - params.height) / 2
+            }
+            WindowPosition.endCenter -> {
+                params.x = (dm.widthPixels - (params.width / 2))
+                params.y = (dm.heightPixels - params.height) / 2
+            }
+            WindowPosition.startCenter ->{
+                params.x = 0
+                params.y = (dm.heightPixels - params.height) / 2
+            }
+            WindowPosition.bottom ->{
+                params.x = 0
+                params.y = (dm.heightPixels - params.height)
+            }
+            WindowPosition.top ->{
+                params.x = 0
+                params.y = 0
+            }
+        }
     }
 
-    private fun initWindowParams() {
-        // initialize window with default values width = 300 and height = 150
-        calculateSizeAndPosition(windowParams, floatingWindowWidth, floatingWindowHeight)
+
+    private fun initWindowParams(width:Int = 300,height:Int = 150,windowPosition: WindowPosition = WindowPosition.center) {
+        // initialize window with default values width = 300 and height = 150 and center position
+        calculateSizeAndPosition(windowParams, width, height,windowPosition)
     }
 
     private fun initWindow() {
@@ -144,24 +191,76 @@ class FloatingWindow (private val context: Context,
 
     fun open() {
         try {
+            closeTheClosingView()
+            Log.d(TAG, "open: opening FloatingView")
+            initWindowParams(width = 300,height = 150)
             windowManager.addView(rootView, windowParams)
             windowIsClosed = false
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this.context,"Unable to addView\nerror msg: please confirm permissions at application startup",Toast.LENGTH_LONG).show()
-            // Ignore exception for now, but in production, you should have some
-            // warning for the user here.
+            Log.e(TAG, "open: ${e.message}")
+            Toast.makeText(this.context,"Unable to addView\nerror msg: unable to open floating Window",Toast.LENGTH_LONG).show()
+        }
+    }
+    private fun closeTheClosingView(){
+        try {
+            windowManager.removeViewImmediate(closedRootView)
+        }catch (ex:Exception){
+            ex.printStackTrace()
         }
     }
 
     private fun close() {
         try {
-            windowManager.removeView(rootView)
+            // There is a problem using animator object
+            // after closing the view it would not opened again!
+
+//            val animation = rootView.animate().apply {
+//                scaleY(0f)
+//                scaleX(0f)
+//                duration = 500
+//            }
+//            animation.setListener(object :Animator.AnimatorListener{
+//                override fun onAnimationStart(p0: Animator?) {}
+//
+//                override fun onAnimationEnd(p0: Animator?) {
+//                  Log.d(TAG, "close: FloatingWindow")
+//                  windowManager.removeViewImmediate(rootView)
+//                  val isSuccessful = openClosedView()
+//                  Log.d(TAG, "close: Closing the closeView Successful: $isSuccessful")
+//                  windowIsClosed = true
+//
+//                }
+//                override fun onAnimationCancel(p0: Animator?) {}
+//                override fun onAnimationRepeat(p0: Animator?) {}
+//            })
+            Log.d(TAG, "close: FloatingWindow")
+            windowManager.removeViewImmediate(rootView)
+            val isSuccessful = openClosedView()
+            Log.d(TAG, "close: Closing the closeView Successful: $isSuccessful")
             windowIsClosed = true
         } catch (e: Exception) {
             e.printStackTrace()
-            // Ignore exception for now, but in production, you should have some
-            // warning for the user here.
+
+        }
+    }
+
+    private fun openClosedView():Boolean{
+        // return true if operation is successful and false if unsuccessful
+        return try {
+            closedRootView.scaleX = 0f
+            closedRootView.scaleY = 0f
+            initWindowParams(width = 40,height = 40,windowPosition = WindowPosition.endCenter)
+            windowManager.addView(closedRootView,windowParams)
+            closedRootView.animate().apply {
+                scaleX(1f)
+                scaleY(1f)
+                duration = 500
+            }
+            true
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            false
         }
     }
     private fun setPosition(x:Int,y:Int){

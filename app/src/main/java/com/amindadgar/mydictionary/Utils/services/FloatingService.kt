@@ -21,7 +21,7 @@ class FloatingService : Service() {
     private val CODE_FOREGROUND_SERVICE = 1
     private val CODE_EXIT_INTENT = 2
     private val CODE_NOTE_INTENT = 3
-    private val TAG = "FloatingWindow"
+    private val TAG = "FloatingWindow Service"
 
     private val NOTIFICATION_TEXT = "DictionaryFloatingService"
 
@@ -57,7 +57,7 @@ class FloatingService : Service() {
     private fun initializeFloatingWindow(wordsData : ArrayList<WordDefinitionTuple>){
         setData(wordsData)
         floatingWindow.refreshData(wordsData)
-        if (!floatingWindow.getWindowStatus()) {
+        if (floatingWindow.getWindowStatus()) {
             Log.d(TAG, "initializeFloatingWindow: Window is getting open")
             floatingWindow.open()
         }

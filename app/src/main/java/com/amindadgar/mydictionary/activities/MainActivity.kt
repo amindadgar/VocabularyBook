@@ -11,6 +11,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
@@ -90,6 +91,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        return super.onCreateOptionsMenu(menu)
+
+    }
     private fun setUpRecyclerView():Boolean{
         recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
 
@@ -443,29 +449,29 @@ class MainActivity : AppCompatActivity() {
                 })
         )
     }
-    private fun setUpWordChooserView(wordsCount:Int):View {
-
-        //setup layout container
-        val linearLayout = LinearLayout(this)
-        linearLayout.orientation = LinearLayout.HORIZONTAL
-        linearLayout.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
-        )
-        linearLayout.weightSum = wordsCount.toFloat()
-
-        for (i in 0 until wordsCount) {
-            val textView = TextView(this)
-            textView.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,
-                1f
-            )
-            linearLayout.addView(textView)
-        }
-
-        return linearLayout
-
-    }
+//    private fun setUpWordChooserView(wordsCount:Int):View {
+//
+//        //setup layout container
+//        val linearLayout = LinearLayout(this)
+//        linearLayout.orientation = LinearLayout.HORIZONTAL
+//        linearLayout.layoutParams = LinearLayout.LayoutParams(
+//            LinearLayout.LayoutParams.MATCH_PARENT,
+//            LinearLayout.LayoutParams.MATCH_PARENT
+//        )
+//        linearLayout.weightSum = wordsCount.toFloat()
+//
+//        for (i in 0 until wordsCount) {
+//            val textView = TextView(this)
+//            textView.layoutParams = LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,
+//                1f
+//            )
+//            linearLayout.addView(textView)
+//        }
+//
+//        return linearLayout
+//
+//    }
 
     private fun checkVoicePermission(){
         ActivityCompat.requestPermissions(
