@@ -49,7 +49,7 @@ class AuthLogin(private val activity: Activity) {
         val isCredentialsAvailable = checkCredentials()
         // if no credentials was available do the login process
         if (!isCredentialsAvailable) {
-            Log.d(TAG, "login: No credentials available, Loging in")
+            Log.d(TAG, "login: No credentials available, Logging in")
             WebAuthProvider.login(auth0)
                 .withScheme("demo")
                 .withScope("openid offline_access")

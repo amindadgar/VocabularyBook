@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         recyclerViewListener(recyclerViewAdapter)
         observeRecyclerViewScroll(recyclerView)
 
+        // TODO("Animate layout changes for recyclerView")
 
         // FireBase is not used yet!
 //        val db = Firebase.firestore

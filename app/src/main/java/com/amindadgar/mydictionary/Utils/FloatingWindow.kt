@@ -1,11 +1,9 @@
 package com.amindadgar.mydictionary.Utils
 
-import android.animation.Animator
 import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
-import android.os.Handler
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
@@ -23,7 +21,7 @@ class FloatingWindow (private val context: Context,
                       private var floatingWindowHeight:Int = 150) {
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val rootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
+    private val textRootView = layoutInflater.inflate(R.layout.floating_window_layout,null)
     private val closedRootView = layoutInflater.inflate(R.layout.floating_window_closed_layout,null)
     private var index = 0
     private val TAG = "FloatingWindow"
@@ -55,7 +53,7 @@ class FloatingWindow (private val context: Context,
 
     init {
         initWindow()
-        rootView.layoutParams = ViewGroup.LayoutParams(
+        textRootView.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -66,12 +64,27 @@ class FloatingWindow (private val context: Context,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT)
         )
-        WordTextView = rootView.findViewById<TextView>(R.id.word_TextView)
-        DefinitionTextView = rootView.findViewById<TextView>(R.id.definition_text)
+        WordTextView = textRootView.findViewById<TextView>(R.id.word_TextView)
+        DefinitionTextView = textRootView.findViewById<TextView>(R.id.definition_text)
 
-        rootView.findViewById<View>(R.id.FloatingWindowContainer).registerDraggableTouchListener(
+        textRootView.findViewById<View>(R.id.FloatingWindowContainer).registerDraggableTouchListener(
             initialPosition = { Point(windowParams.x, windowParams.y) },
-            positionListener = { x, y -> setPosition(x, y) }
+            positionListener = { x,y -> setPosition(x,y) }
+        )
+        closedRootView.findViewById<View>(R.id.closed_floating_window).registerDraggableTouchListener(
+            initialPosition = { Point(windowParams.x, windowParams.y) },
+            positionListener = { x, y ->
+                kotlin.run {
+                    val dm = getCurrentDisplayMetrics()
+                    // if the pointer was in the half left of screen put the layout at the left
+                    if (x < dm.widthPixels / 2) {
+                        setPosition(0 - windowParams.width / 2, y)
+                    } else {
+                        // if the pointer was in the half right of screen put the layout at the right
+                        setPosition(dm.widthPixels - windowParams.width / 2, y)
+                    }
+                }
+            }
         )
         // initialize first item
         setWord(data[0].words,data[0].definitions)
@@ -91,7 +104,7 @@ class FloatingWindow (private val context: Context,
     }
     // this function is for initializing next or previous button click Listeners
     private fun initClickListeners(){
-        rootView.findViewById<View>(R.id.next_icon).setOnClickListener {
+        textRootView.findViewById<View>(R.id.next_icon).setOnClickListener {
             Log.d(TAG, "initClickListeners: Show next item")
             // if all words was shown start from zero
             if (data.size != 1) {
@@ -100,7 +113,7 @@ class FloatingWindow (private val context: Context,
 
             setWord(data[index].words,data[index].definitions)
         }
-        rootView.findViewById<ImageView>(R.id.previous_icon).setOnClickListener {
+        textRootView.findViewById<ImageView>(R.id.previous_icon).setOnClickListener {
             Log.d(TAG, "initClickListeners: Show previous item")
             // check data size bounds
             index = (index - 1) % (data.size - 1)
@@ -183,7 +196,7 @@ class FloatingWindow (private val context: Context,
 
     private fun initWindow() {
         // Using kotlin extension for views caused error, so good old findViewById is used
-        rootView.findViewById<View>(R.id.closeIcon).setOnClickListener { close() }
+        textRootView.findViewById<View>(R.id.closeIcon).setOnClickListener { close() }
 
     }
 
@@ -194,7 +207,7 @@ class FloatingWindow (private val context: Context,
             closeTheClosingView()
             Log.d(TAG, "open: opening FloatingView")
             initWindowParams(width = 300,height = 150)
-            windowManager.addView(rootView, windowParams)
+            windowManager.addView(textRootView, windowParams)
             windowIsClosed = false
         } catch (e: Exception) {
             e.printStackTrace()
@@ -235,7 +248,7 @@ class FloatingWindow (private val context: Context,
 //                override fun onAnimationRepeat(p0: Animator?) {}
 //            })
             Log.d(TAG, "close: FloatingWindow")
-            windowManager.removeViewImmediate(rootView)
+            windowManager.removeViewImmediate(textRootView)
             val isSuccessful = openClosedView()
             Log.d(TAG, "close: Closing the closeView Successful: $isSuccessful")
             windowIsClosed = true
@@ -270,7 +283,13 @@ class FloatingWindow (private val context: Context,
     }
     private fun update(){
         try {
-            windowManager.updateViewLayout(rootView,windowParams)
+            // check to update which layout
+            // if the window is closed update the closedRootView
+            // else update the textRootView
+            if (windowIsClosed)
+                windowManager.updateViewLayout(closedRootView,windowParams)
+            else
+                windowManager.updateViewLayout(textRootView,windowParams)
         }catch (ex:Exception){
             ex.printStackTrace()
         }
