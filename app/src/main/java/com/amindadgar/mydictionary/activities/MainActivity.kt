@@ -56,7 +56,9 @@ class MainActivity : AppCompatActivity() {
             "definition"
         )
     )
-    private var authLogin:AuthLogin? = null
+    private val Auth0_ACCESS_TOKEN = "com.auth0.ACCESS_TOKEN"
+    private val Auth0_EXTRA_ID_TOKEN = "com.auth0.ID_TOKEN"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,18 +104,16 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun startLogin(){
-        // initialize login class
-        authLogin = AuthLogin(this)
-        // start the login process
-        authLogin!!.login()
-    }
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Log.d(TAG, "onNewIntent: received intent")
         if (intent != null) {
-            val data = intent.getStringExtra("com.auth0.ACCESS_TOKEN")
-            Log.d(TAG, "onNewIntent: $data")
+            val accessToken = intent.getStringExtra(Auth0_ACCESS_TOKEN)
+            val extraIdToken = intent.getStringArrayExtra(Auth0_EXTRA_ID_TOKEN)
+            Log.d(TAG, "onNewIntent: $accessToken")
+            Log.d(TAG, "onNewIntent: $extraIdToken")
         }else
             Log.d(TAG, "onNewIntent: No intent available")
     }
@@ -125,7 +125,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.user_profile_menu_item -> {
-                startLogin()
+                startActivity(Intent(this,LoginActivity::class.java))
+                finish()
                 true
             }
             else -> false
