@@ -17,6 +17,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "demo"]
     }
 
     testOptions {
@@ -115,5 +116,9 @@ dependencies {
 
     // lottie after effects library
     implementation "com.airbnb.android:lottie:3.5.0"
+
+    // oauth library
+    implementation 'com.auth0.android:auth0:1.+'
+    implementation 'com.auth0:auth0:1.26.0'
 
 }

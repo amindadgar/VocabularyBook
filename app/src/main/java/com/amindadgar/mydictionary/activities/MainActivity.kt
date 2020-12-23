@@ -12,6 +12,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
@@ -22,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amindadgar.mydictionary.R
+import com.amindadgar.mydictionary.Utils.AuthLogin
 import com.amindadgar.mydictionary.Utils.WordsRecycler.RecyclerTouchListener
 import com.amindadgar.mydictionary.Utils.WordsRecycler.WordRecyclerAdapter
 import com.amindadgar.mydictionary.Utils.services.FloatingService
@@ -35,7 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -48,9 +49,14 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     val REQUEST_AUDIO_CODE = 100
     private lateinit var recyclerViewAdapter:WordRecyclerAdapter
-    var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(WordDefinitionTuple(0,"word","definition"))
-
-
+    var wordsData : ArrayList<WordDefinitionTuple> = arrayListOf(
+        WordDefinitionTuple(
+            0,
+            "word",
+            "definition"
+        )
+    )
+    private var authLogin:AuthLogin? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,9 +98,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_activity_menu, menu)
+        return true
+    }
 
-        return super.onCreateOptionsMenu(menu)
+    fun startLogin(){
+        // initialize login class
+        authLogin = AuthLogin(this)
+        // start the login process
+        authLogin!!.login()
+    }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null) {
+            val data = intent.getStringExtra("com.auth0.ACCESS_TOKEN")
+            Log.d(TAG, "onNewIntent: $data")
+        }else
+            Log.d(TAG, "onNewIntent: No intent available")
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.settings_menu_item -> {
+
+                true
+            }
+            R.id.user_profile_menu_item -> {
+                startLogin()
+                true
+            }
+            else -> false
+        }
     }
     private fun setUpRecyclerView():Boolean{
         recyclerViewAdapter = WordRecyclerAdapter(this, arrayListOf(), supportFragmentManager)
@@ -115,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (dy > 1){
+                if (dy > 1) {
                     setFabAsShown(false)
                 }
                 if (dy < -1)
@@ -123,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    private fun setFabAsShown(show:Boolean){
+    private fun setFabAsShown(show: Boolean){
         if (show)
             fab.show()
         else
@@ -134,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             words?.let {
                 val data = wordsViewModel.initializeItems(words as ArrayList<WordDefinitionTuple>)
                 val size = recyclerViewAdapter.setWords(data)
-                linearLayoutManager.scrollToPosition(size -1)
+                linearLayoutManager.scrollToPosition(size - 1)
                 wordsData = it as ArrayList<WordDefinitionTuple>
 
                 startFloatingService()
@@ -149,7 +184,7 @@ class MainActivity : AppCompatActivity() {
         if (command.isNotBlank()) {
             intent.putExtra("com.amindadgar.mydictionary", command)
         }
-        intent.putParcelableArrayListExtra("FloatingWindowExtra",wordsData)
+        intent.putParcelableArrayListExtra("FloatingWindowExtra", wordsData)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.startForegroundService(intent)
@@ -159,7 +194,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // this function is used to change the appearance of voice icon
-    private fun setVoiceIconAsListening(Listening:Boolean,voiceIcon: ImageView){
+    private fun setVoiceIconAsListening(Listening: Boolean, voiceIcon: ImageView){
         if (Listening){
             voiceIcon.animate().apply {
                 scaleX(1f)
@@ -195,7 +230,7 @@ class MainActivity : AppCompatActivity() {
             }
             val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS , 100);
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 100);
             intent.putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
@@ -210,7 +245,7 @@ class MainActivity : AppCompatActivity() {
 
                  */
                 if (voiceIcon.scaleX == 0.8f) {
-                    setVoiceIconAsListening(true,voiceIcon)
+                    setVoiceIconAsListening(true, voiceIcon)
                     speechRecognizer.startListening(intent)
                 }
                 else {
@@ -236,7 +271,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onEndOfSpeech() {
                     Log.d(TAG, "onEndOfSpeech: Ended!")
                     speechRecognizer.stopListening()
-                    setVoiceIconAsListening(false,voiceIcon)
+                    setVoiceIconAsListening(false, voiceIcon)
                 }
 
                 override fun onError(p0: Int) {
@@ -250,7 +285,8 @@ class MainActivity : AppCompatActivity() {
                 override fun onResults(p0: Bundle?) {
                     // just show the results as a Toast message
                     if (p0 != null) {
-                        val data: ArrayList<String>? = p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        val data: ArrayList<String>? =
+                            p0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         Toast.makeText(this@MainActivity, data!!.toString(), Toast.LENGTH_LONG)
                             .show()
                         (textView as TextView).text = data[0]
@@ -283,7 +319,7 @@ class MainActivity : AppCompatActivity() {
 
             // set dialog listeners
             dialog.setConfirmClickListener {
-                dialogConfirmationButtonClick(textView,dialog)
+                dialogConfirmationButtonClick(textView, dialog)
             }
             dialog.setOnDismissListener {
                 setFabAsShown(true)
@@ -291,7 +327,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun dialogConfirmationButtonClick(textView:View,dialog:SweetAlertDialog){
+    private fun dialogConfirmationButtonClick(textView: View, dialog: SweetAlertDialog){
         Log.d("REQUEST", "DATA")
         var word = (textView as TextView).text.toString()
 
@@ -303,7 +339,7 @@ class MainActivity : AppCompatActivity() {
 
             request(word)
         }else{
-            Toast.makeText(this,"Please enter your word",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please enter your word", Toast.LENGTH_SHORT).show()
         }
 
         dialog.dismiss()
