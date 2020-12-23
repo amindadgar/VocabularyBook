@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import com.amindadgar.mydictionary.R
 import com.amindadgar.mydictionary.activities.MainActivity
 import com.auth0.android.Auth0
@@ -22,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 
-class AuthLogin(val activity: Activity) {
+class AuthLogin(private val activity: Activity) {
     /**
      * @param auth0 is our authentication variable
      * @param TAG is our login tag
@@ -124,6 +125,7 @@ class AuthLogin(val activity: Activity) {
 
             val intent = Intent(activity, MainActivity::class.java)
             if (credentials != null){
+                Toast.makeText(activity,"Login was successful",Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_ACCESS_TOKEN, credentials.accessToken)
                 intent.putExtra(EXTRA_ID_TOKEN, credentials.idToken)
             }

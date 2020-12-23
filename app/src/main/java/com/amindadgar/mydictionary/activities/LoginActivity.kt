@@ -1,5 +1,6 @@
 package com.amindadgar.mydictionary.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.amindadgar.mydictionary.R
@@ -24,5 +25,10 @@ class LoginActivity : AppCompatActivity() {
         authLogin = AuthLogin(this)
         // start the login process
         authLogin!!.login()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        startActivity(Intent(this,MainActivity::class.java))
     }
 }
