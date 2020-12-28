@@ -15,8 +15,8 @@ This is a simple application using google [dictionary API](https://dictionaryapi
 <p align="center">
   <img src="ScreenShots/MainPage.png" width="200" />
   <img src="ScreenShots/WordDescriptionPage.png" width="200" /> 
-  <img src="screenshots/FloatingWindow.png" width="200" />
-  <img src="screenshots/AddWords.png" width="200" />
+  <img src="ScreenShots/FloatingWindow.png" width="200" />
+  <img src="ScreenShots/AddWords.png" width="200" />
 </p>
 
  ## LICENSE
